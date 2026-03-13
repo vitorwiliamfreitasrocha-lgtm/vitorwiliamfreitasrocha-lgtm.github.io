@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VentraSense — Dados Precisos, Decisões Certas</title>
   <meta name="description" content="Estações meteorológicas inteligentes para o agronegócio e operações aeronáuticas. Monitoramento em tempo real, alertas automáticos e dashboard profissional."/>
-  <!-- FAVICON -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <link rel="shortcut icon" href="favicon.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -33,21 +32,17 @@
       font-weight: 300;
       overflow-x: hidden;
     }
-    /* ── SCROLLBAR ── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--cyan-dim); border-radius: 2px; }
-    /* ── CURSOR ── */
     body { cursor: crosshair; }
     a, button { cursor: pointer; }
-    /* ── NOISE OVERLAY ── */
     body::before {
       content: '';
       position: fixed; inset: 0; z-index: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none; opacity: 0.4;
     }
-    /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
@@ -57,146 +52,93 @@
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
-    .nav-logo {
-      display: flex; align-items: center; gap: 12px;
-      text-decoration: none;
-    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     .nav-logo svg { height: 36px; width: auto; }
-    .nav-logo-text {
-      font-size: 1.3rem; font-weight: 700; letter-spacing: 3px;
-      color: #fff;
-    }
+    .nav-logo-text { font-size: 1.3rem; font-weight: 700; letter-spacing: 3px; color: #fff; }
     .nav-logo-text span { color: var(--cyan); }
-    .nav-links {
-      display: flex; align-items: center; gap: 36px;
-      list-style: none;
-    }
+    .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
     .nav-links a {
       color: var(--text-dim); text-decoration: none;
       font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
-      font-family: 'Share Tech Mono', monospace;
-      transition: color 0.2s;
+      font-family: 'Share Tech Mono', monospace; transition: color 0.2s;
     }
     .nav-links a:hover { color: var(--cyan); }
     .nav-cta {
-      background: transparent;
-      border: 1px solid var(--cyan);
-      color: var(--cyan) !important;
-      padding: 8px 20px;
-      border-radius: 2px;
-      font-family: 'Share Tech Mono', monospace !important;
-      font-size: 0.75rem !important;
-      letter-spacing: 2px !important;
-      transition: background 0.2s, color 0.2s !important;
+      background: transparent; border: 1px solid var(--cyan);
+      color: var(--cyan) !important; padding: 8px 20px; border-radius: 2px;
+      font-family: 'Share Tech Mono', monospace !important; font-size: 0.75rem !important;
+      letter-spacing: 2px !important; transition: background 0.2s, color 0.2s !important;
     }
     .nav-cta:hover { background: var(--cyan) !important; color: var(--bg) !important; }
     .nav-dashboard {
-      color: var(--green) !important;
-      border: 1px solid rgba(0,255,157,0.3) !important;
-      padding: 8px 20px;
-      border-radius: 2px;
-      font-family: 'Share Tech Mono', monospace !important;
-      font-size: 0.75rem !important;
-      letter-spacing: 2px !important;
-      background: rgba(0,255,157,0.05) !important;
+      color: var(--green) !important; border: 1px solid rgba(0,255,157,0.3) !important;
+      padding: 8px 20px; border-radius: 2px;
+      font-family: 'Share Tech Mono', monospace !important; font-size: 0.75rem !important;
+      letter-spacing: 2px !important; background: rgba(0,255,157,0.05) !important;
       transition: all 0.2s !important;
     }
     .nav-dashboard:hover { background: var(--green) !important; color: var(--bg) !important; }
     .nav-hamburger { display: none; background: none; border: none; color: var(--cyan); font-size: 1.5rem; }
-    /* ── HERO ── */
     #hero {
       position: relative; min-height: 100vh;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 70px 5vw 0;
-      overflow: hidden;
+      padding: 70px 5vw 0; overflow: hidden;
     }
     .hero-grid {
       position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
-      animation: gridMove 20s linear infinite;
+      background-image: linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px; animation: gridMove 20s linear infinite;
     }
-    @keyframes gridMove {
-      0% { background-position: 0 0; }
-      100% { background-position: 0 60px; }
-    }
+    @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 0 60px; } }
     .hero-glow {
       position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
       width: 600px; height: 300px;
       background: radial-gradient(ellipse, rgba(0,200,255,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
-    .hero-content {
-      position: relative; z-index: 1;
-      text-align: center; max-width: 900px;
-    }
+    .hero-content { position: relative; z-index: 1; text-align: center; max-width: 900px; }
     .hero-badge {
-      display: inline-block;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 4px;
-      color: var(--cyan); border: 1px solid var(--cyan-dim);
-      padding: 6px 16px; margin-bottom: 32px;
-      background: rgba(0,200,255,0.05);
-      animation: fadeUp 0.8s ease both;
+      display: inline-block; font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 4px; color: var(--cyan);
+      border: 1px solid var(--cyan-dim); padding: 6px 16px; margin-bottom: 32px;
+      background: rgba(0,200,255,0.05); animation: fadeUp 0.8s ease both;
     }
     .hero-title {
-      font-size: clamp(2.8rem, 7vw, 5.5rem);
-      font-weight: 900; line-height: 1.05;
-      letter-spacing: -1px;
-      color: #fff;
-      animation: fadeUp 0.8s 0.1s ease both;
+      font-size: clamp(2.8rem, 7vw, 5.5rem); font-weight: 900; line-height: 1.05;
+      letter-spacing: -1px; color: #fff; animation: fadeUp 0.8s 0.1s ease both;
     }
     .hero-title .accent { color: var(--cyan); }
     .hero-title .accent2 { color: var(--green); }
     .hero-sub {
-      margin-top: 24px;
-      font-size: 1.1rem; color: var(--text-dim); line-height: 1.7;
-      max-width: 600px; margin-left: auto; margin-right: auto;
-      animation: fadeUp 0.8s 0.2s ease both;
+      margin-top: 24px; font-size: 1.1rem; color: var(--text-dim); line-height: 1.7;
+      max-width: 600px; margin-left: auto; margin-right: auto; animation: fadeUp 0.8s 0.2s ease both;
     }
-    .hero-btns {
-      margin-top: 44px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-      animation: fadeUp 0.8s 0.3s ease both;
-    }
+    .hero-btns { margin-top: 44px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.8s 0.3s ease both; }
     .btn-primary {
-      background: var(--cyan); color: var(--bg);
-      border: none; padding: 14px 36px;
-      font-family: 'Exo 2', sans-serif; font-weight: 700;
-      font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase;
-      text-decoration: none; display: inline-block;
+      background: var(--cyan); color: var(--bg); border: none; padding: 14px 36px;
+      font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 2px; text-transform: uppercase; text-decoration: none; display: inline-block;
       clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0,200,255,0.4);
-    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,200,255,0.4); }
     .btn-secondary {
-      background: transparent; color: var(--text);
-      border: 1px solid var(--border); padding: 14px 36px;
-      font-family: 'Exo 2', sans-serif; font-weight: 600;
+      background: transparent; color: var(--text); border: 1px solid var(--border);
+      padding: 14px 36px; font-family: 'Exo 2', sans-serif; font-weight: 600;
       font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase;
-      text-decoration: none; display: inline-block;
-      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none; display: inline-block; transition: border-color 0.2s, color 0.2s;
     }
     .btn-secondary:hover { border-color: var(--cyan); color: var(--cyan); }
     .hero-dashboard-box {
-      position: relative; z-index: 1;
-      margin-top: 36px;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 24px;
-      background: rgba(0,255,157,0.04);
-      border: 1px solid rgba(0,255,157,0.2);
-      padding: 20px 28px;
-      max-width: 680px; margin-left: auto; margin-right: auto;
+      position: relative; z-index: 1; margin-top: 36px;
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      background: rgba(0,255,157,0.04); border: 1px solid rgba(0,255,157,0.2);
+      padding: 20px 28px; max-width: 680px; margin-left: auto; margin-right: auto;
       animation: fadeUp 0.8s 0.35s ease both;
     }
     .hero-dashboard-pulse {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--green); flex-shrink: 0;
-      animation: livePulse 2s infinite;
+      width: 10px; height: 10px; border-radius: 50%; background: var(--green);
+      flex-shrink: 0; animation: livePulse 2s infinite;
     }
     @keyframes livePulse {
       0% { box-shadow: 0 0 0 0 rgba(0,255,157,0.5); }
@@ -204,497 +146,166 @@
       100% { box-shadow: 0 0 0 0 rgba(0,255,157,0); }
     }
     .hero-dashboard-info { flex: 1; text-align: left; }
-    .hero-dashboard-label {
-      display: block;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 3px; color: var(--green);
-      margin-bottom: 4px;
-    }
+    .hero-dashboard-label { display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 3px; color: var(--green); margin-bottom: 4px; }
     .hero-dashboard-text { font-size: 0.9rem; color: var(--text); }
     .btn-dashboard {
-      background: var(--green); color: var(--bg);
-      border: none; padding: 12px 24px;
-      font-family: 'Exo 2', sans-serif; font-weight: 700;
-      font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
-      text-decoration: none; white-space: nowrap;
-      display: flex; align-items: center; gap: 8px;
+      background: var(--green); color: var(--bg); border: none; padding: 12px 24px;
+      font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 0.8rem;
+      letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+      white-space: nowrap; display: flex; align-items: center; gap: 8px;
       clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    .btn-dashboard:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(0,255,157,0.4);
-    }
+    .btn-dashboard:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,255,157,0.4); }
     .hero-stats {
       display: flex; gap: 60px; margin-top: 80px; padding-top: 40px;
-      border-top: 1px solid var(--border);
-      animation: fadeUp 0.8s 0.4s ease both;
+      border-top: 1px solid var(--border); animation: fadeUp 0.8s 0.4s ease both;
     }
     .hero-stat { text-align: center; }
-    .hero-stat-num {
-      font-size: 2rem; font-weight: 900; color: var(--cyan);
-      font-family: 'Share Tech Mono', monospace;
-    }
-    .hero-stat-label {
-      font-size: 0.7rem; letter-spacing: 2px; color: var(--text-dim);
-      text-transform: uppercase; margin-top: 4px;
-    }
-    /* ── WAVE DIVIDER ── */
-    .wave-divider {
-      height: 2px; width: 100%;
-      background: linear-gradient(90deg, transparent, var(--cyan), var(--green), transparent);
-      opacity: 0.3; margin: 0;
-    }
-    /* ── SECTIONS ── */
+    .hero-stat-num { font-size: 2rem; font-weight: 900; color: var(--cyan); font-family: 'Share Tech Mono', monospace; }
+    .hero-stat-label { font-size: 0.7rem; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; }
+    .wave-divider { height: 2px; width: 100%; background: linear-gradient(90deg, transparent, var(--cyan), var(--green), transparent); opacity: 0.3; }
     section { position: relative; z-index: 1; }
     .section-inner { max-width: 1200px; margin: 0 auto; padding: 100px 5vw; }
-    .section-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 4px;
-      color: var(--cyan); text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 900; color: #fff; line-height: 1.1;
-      margin-bottom: 20px;
-    }
-    .section-desc {
-      font-size: 1rem; color: var(--text-dim); max-width: 560px; line-height: 1.8;
-    }
-    /* ── PRODUTOS ── */
+    .section-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 12px; }
+    .section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 20px; }
+    .section-desc { font-size: 1rem; color: var(--text-dim); max-width: 560px; line-height: 1.8; }
     #produtos { background: var(--bg2); }
-    .produtos-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
-      margin-top: 60px;
-    }
-    .produto-card {
-      background: var(--card);
-      padding: 60px 52px;
-      position: relative; overflow: hidden;
-      transition: background 0.3s;
-    }
+    .produtos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 60px; }
+    .produto-card { background: var(--card); padding: 60px 52px; position: relative; overflow: hidden; transition: background 0.3s; }
     .produto-card:hover { background: #0e2038; }
-    .produto-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    }
+    .produto-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
     .produto-card.agro::before { background: linear-gradient(90deg, var(--green), transparent); }
     .produto-card.aero::before { background: linear-gradient(90deg, var(--cyan), transparent); }
-    .produto-icon {
-      font-size: 3rem; margin-bottom: 24px; display: block;
-    }
-    .produto-tag {
-      display: inline-block;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 3px;
-      padding: 4px 12px; margin-bottom: 20px;
-      border-radius: 1px;
-    }
+    .produto-icon { font-size: 3rem; margin-bottom: 24px; display: block; }
+    .produto-tag { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 3px; padding: 4px 12px; margin-bottom: 20px; border-radius: 1px; }
     .produto-tag.agro { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,157,0.2); }
     .produto-tag.aero { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,200,255,0.2); }
     .produto-title { font-size: 1.8rem; font-weight: 900; color: #fff; margin-bottom: 16px; }
     .produto-desc { color: var(--text-dim); line-height: 1.8; margin-bottom: 32px; }
     .produto-features { list-style: none; margin-bottom: 40px; }
-    .produto-features li {
-      padding: 10px 0; border-bottom: 1px solid var(--border);
-      font-size: 0.9rem; display: flex; align-items: center; gap: 12px;
-      color: var(--text);
-    }
-    .produto-features li::before {
-      content: '▸'; font-size: 0.6rem;
-    }
+    .produto-features li { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; display: flex; align-items: center; gap: 12px; color: var(--text); }
+    .produto-features li::before { content: '▸'; font-size: 0.6rem; }
     .produto-card.agro .produto-features li::before { color: var(--green); }
     .produto-card.aero .produto-features li::before { color: var(--cyan); }
-    .produto-price {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px;
-    }
+    .produto-price { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; }
     .produto-price strong { font-size: 1.4rem; color: #fff; margin-right: 4px; }
-    .produto-bg-num {
-      position: absolute; right: -20px; bottom: -40px;
-      font-size: 12rem; font-weight: 900;
-      opacity: 0.02; color: #fff;
-      font-family: 'Share Tech Mono', monospace;
-      pointer-events: none; user-select: none;
-    }
-    /* ── VIDEO ── */
+    .produto-bg-num { position: absolute; right: -20px; bottom: -40px; font-size: 12rem; font-weight: 900; opacity: 0.02; color: #fff; font-family: 'Share Tech Mono', monospace; pointer-events: none; user-select: none; }
     #video { background: var(--bg); }
-    .video-wrapper {
-      margin-top: 60px; position: relative;
-      border: 1px solid var(--border);
-      background: var(--card);
-      aspect-ratio: 16/9;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-    }
-    .video-grid-bg {
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-    .video-placeholder {
-      position: relative; z-index: 1; text-align: center;
-    }
-    .video-play-btn {
-      width: 80px; height: 80px;
-      border: 2px solid var(--cyan);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 24px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
-      animation: pulse 2s infinite;
-    }
+    .video-wrapper { margin-top: 60px; position: relative; border: 1px solid var(--border); background: var(--card); aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .video-grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+    .video-placeholder { position: relative; z-index: 1; text-align: center; }
+    .video-play-btn { width: 80px; height: 80px; border: 2px solid var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; cursor: pointer; transition: background 0.2s, transform 0.2s; animation: pulse 2s infinite; }
     .video-play-btn:hover { background: rgba(0,200,255,0.1); transform: scale(1.05); }
     .video-play-btn svg { width: 28px; height: 28px; fill: var(--cyan); margin-left: 4px; }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(0,200,255,0.3); }
-      50% { box-shadow: 0 0 0 20px rgba(0,200,255,0); }
-    }
-    .video-placeholder p {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.75rem; letter-spacing: 3px; color: var(--text-dim);
-    }
-    .video-corner {
-      position: absolute; width: 20px; height: 20px;
-    }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,200,255,0.3); } 50% { box-shadow: 0 0 0 20px rgba(0,200,255,0); } }
+    .video-placeholder p { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 3px; color: var(--text-dim); }
+    .video-corner { position: absolute; width: 20px; height: 20px; }
     .video-corner.tl { top: 12px; left: 12px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
     .video-corner.tr { top: 12px; right: 12px; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
     .video-corner.bl { bottom: 12px; left: 12px; border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
     .video-corner.br { bottom: 12px; right: 12px; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
-    /* ── DIFERENCIAIS ── */
     #diferenciais { background: var(--bg3); }
-    .diferenciais-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
-      margin-top: 60px; background: var(--border);
-    }
-    .diferencial-item {
-      background: var(--bg3); padding: 44px 36px;
-      transition: background 0.3s;
-    }
+    .diferenciais-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 60px; background: var(--border); }
+    .diferencial-item { background: var(--bg3); padding: 44px 36px; transition: background 0.3s; }
     .diferencial-item:hover { background: var(--card); }
-    .diferencial-icon {
-      font-size: 2rem; margin-bottom: 20px; display: block;
-    }
-    .diferencial-title {
-      font-size: 1.1rem; font-weight: 700; color: #fff;
-      margin-bottom: 12px; letter-spacing: 0.5px;
-    }
+    .diferencial-icon { font-size: 2rem; margin-bottom: 20px; display: block; }
+    .diferencial-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 12px; letter-spacing: 0.5px; }
     .diferencial-desc { font-size: 0.9rem; color: var(--text-dim); line-height: 1.7; }
-    /* ── PLANOS ── */
     #planos { background: var(--bg2); }
-    .planos-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
-      margin-top: 60px;
-    }
-    .plano-card {
-      background: var(--card); padding: 44px 36px;
-      position: relative; overflow: hidden;
-      transition: transform 0.3s;
-      border: 1px solid var(--border);
-    }
+    .planos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 60px; }
+    .plano-card { background: var(--card); padding: 44px 36px; position: relative; overflow: hidden; transition: transform 0.3s; border: 1px solid var(--border); }
     .plano-card:hover { transform: translateY(-4px); }
-    .plano-card.destaque {
-      border-color: var(--cyan);
-      background: linear-gradient(135deg, #0b1929 0%, #0d2238 100%);
-    }
-    .plano-destaque-tag {
-      position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
-      background: var(--cyan); color: var(--bg);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 3px; padding: 4px 16px;
-      white-space: nowrap;
-    }
-    .plano-nome {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 4px; color: var(--text-dim);
-      text-transform: uppercase; margin-bottom: 20px;
-    }
-    .plano-preco {
-      font-size: 2.2rem; font-weight: 900; color: #fff;
-      margin-bottom: 4px;
-    }
+    .plano-card.destaque { border-color: var(--cyan); background: linear-gradient(135deg, #0b1929 0%, #0d2238 100%); }
+    .plano-destaque-tag { position: absolute; top: -1px; left: 50%; transform: translateX(-50%); background: var(--cyan); color: var(--bg); font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 3px; padding: 4px 16px; white-space: nowrap; }
+    .plano-nome { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 4px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 20px; }
+    .plano-preco { font-size: 2.2rem; font-weight: 900; color: #fff; margin-bottom: 4px; }
     .plano-preco span { font-size: 1rem; color: var(--text-dim); font-weight: 300; }
-    .plano-hardware {
-      font-size: 0.8rem; color: var(--text-dim);
-      margin-bottom: 28px; padding-bottom: 28px;
-      border-bottom: 1px solid var(--border);
-    }
+    .plano-hardware { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
     .plano-features { list-style: none; margin-bottom: 36px; }
-    .plano-features li {
-      padding: 8px 0; font-size: 0.88rem; color: var(--text);
-      display: flex; align-items: center; gap: 10px;
-    }
+    .plano-features li { padding: 8px 0; font-size: 0.88rem; color: var(--text); display: flex; align-items: center; gap: 10px; }
     .plano-features li .check { color: var(--green); font-size: 0.8rem; }
     .plano-features li .x { color: var(--text-dim); font-size: 0.8rem; }
-    .btn-plano {
-      display: block; text-align: center; text-decoration: none;
-      padding: 12px; font-weight: 700; font-size: 0.8rem;
-      letter-spacing: 2px; text-transform: uppercase;
-      border: 1px solid var(--border); color: var(--text);
-      transition: all 0.2s;
-    }
-    .btn-plano:hover, .plano-card.destaque .btn-plano {
-      background: var(--cyan); color: var(--bg); border-color: var(--cyan);
-    }
-    /* ── LOJA / CARRINHO ── */
+    .btn-plano { display: block; text-align: center; text-decoration: none; padding: 12px; font-weight: 700; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--border); color: var(--text); transition: all 0.2s; }
+    .btn-plano:hover, .plano-card.destaque .btn-plano { background: var(--cyan); color: var(--bg); border-color: var(--cyan); }
     #loja { background: var(--bg); }
-    .loja-grid {
-      display: grid; grid-template-columns: 1fr 360px; gap: 40px;
-      margin-top: 60px; align-items: start;
-    }
+    .loja-grid { display: grid; grid-template-columns: 1fr 360px; gap: 40px; margin-top: 60px; align-items: start; }
     .loja-produtos { display: flex; flex-direction: column; gap: 2px; }
-    .loja-item {
-      background: var(--card); border: 1px solid var(--border);
-      padding: 28px 32px;
-      display: flex; align-items: center; gap: 24px;
-      transition: border-color 0.2s;
-    }
+    .loja-item { background: var(--card); border: 1px solid var(--border); padding: 28px 32px; display: flex; align-items: center; gap: 24px; transition: border-color 0.2s; }
     .loja-item:hover { border-color: var(--cyan-dim); }
     .loja-item-icon { font-size: 2.5rem; flex-shrink: 0; }
     .loja-item-info { flex: 1; }
     .loja-item-name { font-weight: 700; color: #fff; margin-bottom: 4px; }
     .loja-item-desc { font-size: 0.85rem; color: var(--text-dim); }
-    .loja-item-price {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 1rem; color: var(--cyan); white-space: nowrap;
-    }
+    .loja-item-price { font-family: 'Share Tech Mono', monospace; font-size: 1rem; color: var(--cyan); white-space: nowrap; }
     .loja-item-price small { display: block; font-size: 0.65rem; color: var(--text-dim); text-align: right; }
-    .btn-add {
-      background: transparent; border: 1px solid var(--cyan-dim);
-      color: var(--cyan); padding: 8px 16px;
-      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
-      letter-spacing: 2px; cursor: pointer; white-space: nowrap;
-      transition: all 0.2s; flex-shrink: 0;
-    }
+    .btn-add { background: transparent; border: 1px solid var(--cyan-dim); color: var(--cyan); padding: 8px 16px; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
     .btn-add:hover { background: var(--cyan); color: var(--bg); }
     .btn-add.added { background: var(--green-dim); border-color: var(--green); color: var(--green); }
-    /* CARRINHO */
-    .carrinho {
-      background: var(--card); border: 1px solid var(--border);
-      position: sticky; top: 90px;
-    }
-    .carrinho-header {
-      padding: 20px 28px; border-bottom: 1px solid var(--border);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.75rem; letter-spacing: 3px; color: var(--cyan);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .carrinho-badge {
-      background: var(--cyan); color: var(--bg);
-      width: 22px; height: 22px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; font-weight: 900;
-    }
+    .carrinho { background: var(--card); border: 1px solid var(--border); position: sticky; top: 90px; }
+    .carrinho-header { padding: 20px 28px; border-bottom: 1px solid var(--border); font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 3px; color: var(--cyan); display: flex; align-items: center; justify-content: space-between; }
+    .carrinho-badge { background: var(--cyan); color: var(--bg); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 900; }
     .carrinho-items { min-height: 120px; padding: 20px 28px; }
-    .carrinho-empty {
-      font-size: 0.85rem; color: var(--text-dim); text-align: center;
-      padding: 30px 0; font-family: 'Share Tech Mono', monospace;
-      letter-spacing: 1px;
-    }
-    .carrinho-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid var(--border);
-      font-size: 0.85rem;
-    }
+    .carrinho-empty { font-size: 0.85rem; color: var(--text-dim); text-align: center; padding: 30px 0; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+    .carrinho-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
     .carrinho-item-name { color: var(--text); }
     .carrinho-item-price { color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; }
-    .carrinho-item-remove {
-      background: none; border: none; color: var(--text-dim);
-      cursor: pointer; font-size: 0.8rem; padding: 0 6px;
-      transition: color 0.2s;
-    }
+    .carrinho-item-remove { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.8rem; padding: 0 6px; transition: color 0.2s; }
     .carrinho-item-remove:hover { color: #ff4444; }
     .carrinho-footer { padding: 20px 28px; border-top: 1px solid var(--border); }
-    .carrinho-total {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 8px;
-    }
-    .carrinho-total-label {
-      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
-      letter-spacing: 2px; color: var(--text-dim);
-    }
-    .carrinho-total-val {
-      font-family: 'Share Tech Mono', monospace; font-size: 1.1rem;
-      color: #fff; font-weight: 700;
-    }
-    .carrinho-mensalidade {
-      font-size: 0.75rem; color: var(--text-dim); margin-bottom: 20px;
-      padding: 10px; background: rgba(0,200,255,0.04);
-      border: 1px solid var(--border);
-    }
-    .btn-checkout {
-      display: block; width: 100%; text-align: center;
-      background: var(--cyan); color: var(--bg);
-      border: none; padding: 14px;
-      font-family: 'Exo 2', sans-serif; font-weight: 700;
-      font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase;
-      cursor: pointer; transition: opacity 0.2s;
-    }
+    .carrinho-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .carrinho-total-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; color: var(--text-dim); }
+    .carrinho-total-val { font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: #fff; font-weight: 700; }
+    .carrinho-mensalidade { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 20px; padding: 10px; background: rgba(0,200,255,0.04); border: 1px solid var(--border); }
+    .btn-checkout { display: block; width: 100%; text-align: center; background: var(--cyan); color: var(--bg); border: none; padding: 14px; font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
     .btn-checkout:hover { opacity: 0.85; }
     .btn-checkout:disabled { opacity: 0.3; cursor: not-allowed; }
-    /* LOGIN MODAL */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 200;
-      background: rgba(6,12,20,0.9); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center;
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(6,12,20,0.9); backdrop-filter: blur(8px); align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--bg2); border: 1px solid var(--border);
-      padding: 48px; width: 100%; max-width: 440px;
-      position: relative;
-      animation: fadeUp 0.3s ease both;
-    }
-    .modal-close {
-      position: absolute; top: 16px; right: 20px;
-      background: none; border: none; color: var(--text-dim);
-      font-size: 1.2rem; cursor: pointer;
-    }
-    .modal-title {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 4px; color: var(--cyan);
-      margin-bottom: 8px;
-    }
+    .modal { background: var(--bg2); border: 1px solid var(--border); padding: 48px; width: 100%; max-width: 440px; position: relative; animation: fadeUp 0.3s ease both; }
+    .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; }
+    .modal-title { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 4px; color: var(--cyan); margin-bottom: 8px; }
     .modal-heading { font-size: 1.6rem; font-weight: 900; color: #fff; margin-bottom: 32px; }
     .form-group { margin-bottom: 20px; }
-    .form-label {
-      display: block; font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 3px; color: var(--text-dim);
-      margin-bottom: 8px; text-transform: uppercase;
-    }
-    .form-input {
-      width: 100%; background: var(--bg); border: 1px solid var(--border);
-      color: var(--text); padding: 12px 16px;
-      font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;
-      outline: none; transition: border-color 0.2s;
-    }
+    .form-label { display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
+    .form-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
     .form-input:focus { border-color: var(--cyan); }
-    .form-tabs {
-      display: flex; margin-bottom: 28px; border-bottom: 1px solid var(--border);
-    }
-    .form-tab {
-      padding: 10px 20px; background: none; border: none;
-      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
-      letter-spacing: 2px; color: var(--text-dim); cursor: pointer;
-      border-bottom: 2px solid transparent; margin-bottom: -1px;
-      transition: all 0.2s;
-    }
+    .form-tabs { display: flex; margin-bottom: 28px; border-bottom: 1px solid var(--border); }
+    .form-tab { padding: 10px 20px; background: none; border: none; font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
     .form-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
-    .btn-login {
-      width: 100%; padding: 14px;
-      background: var(--cyan); color: var(--bg); border: none;
-      font-family: 'Exo 2', sans-serif; font-weight: 700;
-      font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase;
-      cursor: pointer; transition: opacity 0.2s; margin-top: 8px;
-    }
+    .btn-login { width: 100%; padding: 14px; background: var(--cyan); color: var(--bg); border: none; font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; margin-top: 8px; }
     .btn-login:hover { opacity: 0.85; }
-    .form-footer {
-      text-align: center; margin-top: 20px;
-      font-size: 0.8rem; color: var(--text-dim);
-    }
-    .form-footer a { color: var(--cyan); text-decoration: none; }
-    /* ── CONTATO ── */
     #contato { background: var(--bg3); }
-    .contato-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
-      margin-top: 60px; align-items: start;
-    }
+    .contato-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 60px; align-items: start; }
     .contato-info p { color: var(--text-dim); line-height: 1.8; margin-bottom: 36px; }
-    .contato-item {
-      display: flex; gap: 16px; align-items: flex-start;
-      margin-bottom: 24px;
-    }
-    .contato-item-icon {
-      width: 40px; height: 40px; flex-shrink: 0;
-      border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
-    }
-    .contato-item-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 2px; color: var(--text-dim);
-      margin-bottom: 4px;
-    }
+    .contato-item { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
+    .contato-item-icon { width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .contato-item-label { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 4px; }
     .contato-item-val { font-size: 0.95rem; color: var(--text); }
     .contato-form { display: flex; flex-direction: column; gap: 16px; }
-    .contato-form textarea {
-      width: 100%; background: var(--bg); border: 1px solid var(--border);
-      color: var(--text); padding: 12px 16px; height: 120px; resize: vertical;
-      font-family: 'Exo 2', sans-serif; font-size: 0.9rem;
-      outline: none; transition: border-color 0.2s;
-    }
+    .contato-form textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; height: 120px; resize: vertical; font-family: 'Exo 2', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
     .contato-form textarea:focus { border-color: var(--cyan); }
-    .btn-enviar {
-      background: transparent; border: 1px solid var(--cyan);
-      color: var(--cyan); padding: 14px 36px;
-      font-family: 'Exo 2', sans-serif; font-weight: 700;
-      font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase;
-      cursor: pointer; transition: all 0.2s; align-self: flex-start;
-    }
+    .btn-enviar { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 14px 36px; font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; align-self: flex-start; }
     .btn-enviar:hover { background: var(--cyan); color: var(--bg); }
-    /* ── FOOTER ── */
-    footer {
-      background: var(--bg); border-top: 1px solid var(--border);
-      padding: 60px 5vw 40px;
-    }
-    .footer-inner {
-      max-width: 1200px; margin: 0 auto;
-      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px;
-      margin-bottom: 60px;
-    }
-    .footer-brand p {
-      font-size: 0.88rem; color: var(--text-dim); line-height: 1.7;
-      margin-top: 16px; max-width: 300px;
-    }
-    .footer-col h4 {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 4px; color: var(--cyan);
-      text-transform: uppercase; margin-bottom: 20px;
-    }
+    footer { background: var(--bg); border-top: 1px solid var(--border); padding: 60px 5vw 40px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 60px; }
+    .footer-brand p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.7; margin-top: 16px; max-width: 300px; }
+    .footer-col h4 { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 20px; }
     .footer-col ul { list-style: none; }
     .footer-col ul li { margin-bottom: 10px; }
-    .footer-col ul li a {
-      color: var(--text-dim); text-decoration: none; font-size: 0.88rem;
-      transition: color 0.2s;
-    }
+    .footer-col ul li a { color: var(--text-dim); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
     .footer-col ul li a:hover { color: var(--text); }
-    .footer-bottom {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; justify-content: space-between; align-items: center;
-      border-top: 1px solid var(--border); padding-top: 28px;
-    }
-    .footer-copy {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 2px; color: var(--text-dim);
-    }
-    .footer-logo-text {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.8rem; letter-spacing: 4px; color: var(--text-dim);
-    }
+    .footer-bottom { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 28px; }
+    .footer-copy { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 2px; color: var(--text-dim); }
+    .footer-logo-text { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 4px; color: var(--text-dim); }
     .footer-logo-text span { color: var(--cyan); }
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .reveal {
-      opacity: 0; transform: translateY(32px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
-    /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .nav-links { display: none; }
       .nav-hamburger { display: block; }
-      .nav-links.open {
-        display: flex; flex-direction: column;
-        position: absolute; top: 70px; left: 0; right: 0;
-        background: var(--bg2); padding: 20px; gap: 20px;
-        border-bottom: 1px solid var(--border);
-      }
+      .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: var(--bg2); padding: 20px; gap: 20px; border-bottom: 1px solid var(--border); }
       .produtos-grid, .planos-grid, .contato-grid { grid-template-columns: 1fr; }
       .loja-grid { grid-template-columns: 1fr; }
       .diferenciais-grid { grid-template-columns: 1fr 1fr; }
@@ -709,25 +320,15 @@
   </style>
 </head>
 <body>
-<!-- NAV -->
 <nav>
   <a href="#hero" class="nav-logo">
     <svg viewBox="0 0 320 50" xmlns="http://www.w3.org/2000/svg" style="height:38px;width:auto;">
-      <defs>
-        <linearGradient id="wg" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" style="stop-color:#00c8ff"/>
-          <stop offset="100%" style="stop-color:#00ff9d"/>
-        </linearGradient>
-      </defs>
-      <!-- horizonte -->
+      <defs><linearGradient id="wg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#00c8ff"/><stop offset="100%" style="stop-color:#00ff9d"/></linearGradient></defs>
       <line x1="4" y1="32" x2="38" y2="32" stroke="url(#wg)" stroke-width="1.2"/>
-      <!-- torre -->
       <line x1="21" y1="32" x2="21" y2="18" stroke="#00c8ff" stroke-width="1.2" opacity="0.6"/>
       <circle cx="21" cy="17" r="1.8" fill="#00c8ff"/>
-      <!-- ondas -->
       <path d="M13 26 Q21 20 29 26" fill="none" stroke="#00c8ff" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
       <path d="M7 20 Q21 10 35 20" fill="none" stroke="url(#wg)" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
-      <!-- texto -->
       <text x="46" y="31" font-family="'Exo 2',sans-serif" font-weight="900" font-size="20" letter-spacing="2" fill="#ffffff">VENTRA<tspan fill="#00c8ff">SENSE</tspan></text>
     </svg>
   </a>
@@ -742,21 +343,13 @@
   </ul>
   <button class="nav-hamburger" id="hamburger" aria-label="Menu">☰</button>
 </nav>
-<!-- HERO -->
 <section id="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="hero-content">
     <div class="hero-badge">// MONITORAMENTO METEOROLÓGICO INTELIGENTE</div>
-    <h1 class="hero-title">
-      Dados <span class="accent">precisos</span><br/>
-      onde o clima<br/>
-      <span class="accent2">importa</span>
-    </h1>
-    <p class="hero-sub">
-      Estações meteorológicas profissionais para o agronegócio e operações aeronáuticas.
-      Monitoramento em tempo real, alertas automáticos e dashboard na palma da mão.
-    </p>
+    <h1 class="hero-title">Dados <span class="accent">precisos</span><br/>onde o clima<br/><span class="accent2">importa</span></h1>
+    <p class="hero-sub">Estações meteorológicas profissionais para o agronegócio e operações aeronáuticas. Monitoramento em tempo real, alertas automáticos e dashboard na palma da mão.</p>
     <div class="hero-btns">
       <a href="#produtos" class="btn-primary">Conheça as Estações</a>
       <a href="#loja" class="btn-secondary">Montar meu Kit</a>
@@ -767,47 +360,28 @@
         <span class="hero-dashboard-label">// JÁ É CLIENTE?</span>
         <span class="hero-dashboard-text">Acesse sua estação meteorológica em tempo real</span>
       </div>
-      <a href="https://dashboard.ventrasense.com.br" target="_blank" class="btn-dashboard">
-        <span>⬡</span> ACESSAR DASHBOARD
-      </a>
+      <a href="https://dashboard.ventrasense.com.br" target="_blank" class="btn-dashboard"><span>⬡</span> ACESSAR DASHBOARD</a>
     </div>
   </div>
   <div class="hero-stats">
-    <div class="hero-stat">
-      <div class="hero-stat-num">24/7</div>
-      <div class="hero-stat-label">Monitoramento</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">10s</div>
-      <div class="hero-stat-label">Atualização</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">100%</div>
-      <div class="hero-stat-label">Nuvem</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">∞</div>
-      <div class="hero-stat-label">Estações</div>
-    </div>
+    <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">Monitoramento</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">10s</div><div class="hero-stat-label">Atualização</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">Nuvem</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Estações</div></div>
   </div>
 </section>
 <div class="wave-divider"></div>
-<!-- PRODUTOS -->
 <section id="produtos">
   <div class="section-inner">
     <div class="section-label">// SOLUÇÕES</div>
     <h2 class="section-title">Duas estações.<br/>Um único padrão de excelência.</h2>
     <p class="section-desc">Desenvolvidas para os desafios reais do campo e do ar, com hardware robusto e software profissional.</p>
     <div class="produtos-grid reveal">
-      <!-- AGRO -->
       <div class="produto-card agro">
         <span class="produto-icon">🌱</span>
         <span class="produto-tag agro">AGROMETEOROLOGIA</span>
         <h3 class="produto-title">VentraSense Agro</h3>
-        <p class="produto-desc">
-          Monitoramento completo para propriedades rurais, cooperativas e culturas de precisão.
-          Tome decisões de irrigação, colheita e manejo baseadas em dados reais da sua propriedade.
-        </p>
+        <p class="produto-desc">Monitoramento completo para propriedades rurais, cooperativas e culturas de precisão. Tome decisões de irrigação, colheita e manejo baseadas em dados reais da sua propriedade.</p>
         <ul class="produto-features">
           <li>Temperatura e umidade do ar (±0.1°C)</li>
           <li>Velocidade e direção do vento</li>
@@ -818,20 +392,14 @@
           <li>Alertas por e-mail automáticos</li>
           <li>Registro em cartão SD local</li>
         </ul>
-        <div class="produto-price">
-          A partir de <strong>R$ 800</strong> + R$ 79/mês
-        </div>
+        <div class="produto-price">A partir de <strong>R$ 800</strong> + R$ 79/mês</div>
         <div class="produto-bg-num">A</div>
       </div>
-      <!-- AERO -->
       <div class="produto-card aero">
         <span class="produto-icon">✈️</span>
         <span class="produto-tag aero">OPERAÇÕES AERONÁUTICAS</span>
         <h3 class="produto-title">VentraSense Aero</h3>
-        <p class="produto-desc">
-          Dados meteorológicos profissionais para aeródromos, helipads e pistas privadas.
-          Com sistema ATIS automático integrado para apoio às operações de voo.
-        </p>
+        <p class="produto-desc">Dados meteorológicos profissionais para aeródromos, helipads e pistas privadas. Com sistema ATIS automático integrado para apoio às operações de voo.</p>
         <ul class="produto-features">
           <li>Todos os sensores da versão Agro</li>
           <li>Leitura de vento em nós e km/h</li>
@@ -842,15 +410,12 @@
           <li>Dashboard com interface aeronáutica</li>
           <li>Suporte técnico dedicado</li>
         </ul>
-        <div class="produto-price">
-          A partir de <strong>R$ 1.200</strong> + R$ 129/mês
-        </div>
+        <div class="produto-price">A partir de <strong>R$ 1.200</strong> + R$ 129/mês</div>
         <div class="produto-bg-num">B</div>
       </div>
     </div>
   </div>
 </section>
-<!-- VIDEO -->
 <section id="video">
   <div class="section-inner">
     <div class="section-label">// EM AÇÃO</div>
@@ -858,58 +423,28 @@
     <div class="video-wrapper reveal">
       <div class="video-grid-bg"></div>
       <div class="video-placeholder">
-        <div class="video-play-btn">
-          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-        </div>
+        <div class="video-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
         <p>VÍDEO EM BREVE</p>
       </div>
-      <div class="video-corner tl"></div>
-      <div class="video-corner tr"></div>
-      <div class="video-corner bl"></div>
-      <div class="video-corner br"></div>
+      <div class="video-corner tl"></div><div class="video-corner tr"></div>
+      <div class="video-corner bl"></div><div class="video-corner br"></div>
     </div>
   </div>
 </section>
-<!-- DIFERENCIAIS -->
 <section id="diferenciais">
   <div class="section-inner">
     <div class="section-label">// POR QUE VENTRASENSE</div>
     <h2 class="section-title">Tecnologia que<br/>trabalha por você</h2>
     <div class="diferenciais-grid reveal">
-      <div class="diferencial-item">
-        <span class="diferencial-icon">⚡</span>
-        <div class="diferencial-title">Atualização a cada 10s</div>
-        <p class="diferencial-desc">Dados enviados continuamente para a nuvem. Você vê o que está acontecendo agora, sem atraso.</p>
-      </div>
-      <div class="diferencial-item">
-        <span class="diferencial-icon">🔔</span>
-        <div class="diferencial-title">Alertas Inteligentes</div>
-        <p class="diferencial-desc">Geada, vento forte, chuva intensa, nevoeiro. Receba alertas por e-mail antes que o problema chegue.</p>
-      </div>
-      <div class="diferencial-item">
-        <span class="diferencial-icon">☁️</span>
-        <div class="diferencial-title">100% na Nuvem</div>
-        <p class="diferencial-desc">Servidor dedicado online 24h por dia. Acesse o dashboard de qualquer celular, tablet ou computador.</p>
-      </div>
-      <div class="diferencial-item">
-        <span class="diferencial-icon">📡</span>
-        <div class="diferencial-title">Instalação Simples</div>
-        <p class="diferencial-desc">Conecta ao WiFi da propriedade e começa a enviar dados. Sem configurações complexas.</p>
-      </div>
-      <div class="diferencial-item">
-        <span class="diferencial-icon">🎙️</span>
-        <div class="diferencial-title">ATIS por Voz</div>
-        <p class="diferencial-desc">Para aeródromos: informações meteorológicas lidas automaticamente em português. Toque um botão e ouça.</p>
-      </div>
-      <div class="diferencial-item">
-        <span class="diferencial-icon">🛡️</span>
-        <div class="diferencial-title">Hardware Robusto</div>
-        <p class="diferencial-desc">Sensores calibrados, protegidos e testados para o ambiente externo. Alimentação estabilizada contra surtos.</p>
-      </div>
+      <div class="diferencial-item"><span class="diferencial-icon">⚡</span><div class="diferencial-title">Atualização a cada 10s</div><p class="diferencial-desc">Dados enviados continuamente para a nuvem. Você vê o que está acontecendo agora, sem atraso.</p></div>
+      <div class="diferencial-item"><span class="diferencial-icon">🔔</span><div class="diferencial-title">Alertas Inteligentes</div><p class="diferencial-desc">Geada, vento forte, chuva intensa, nevoeiro. Receba alertas por e-mail antes que o problema chegue.</p></div>
+      <div class="diferencial-item"><span class="diferencial-icon">☁️</span><div class="diferencial-title">100% na Nuvem</div><p class="diferencial-desc">Servidor dedicado online 24h por dia. Acesse o dashboard de qualquer celular, tablet ou computador.</p></div>
+      <div class="diferencial-item"><span class="diferencial-icon">📡</span><div class="diferencial-title">Instalação Simples</div><p class="diferencial-desc">Conecta ao WiFi da propriedade e começa a enviar dados. Sem configurações complexas.</p></div>
+      <div class="diferencial-item"><span class="diferencial-icon">🎙️</span><div class="diferencial-title">ATIS por Voz</div><p class="diferencial-desc">Para aeródromos: informações meteorológicas lidas automaticamente em português. Toque um botão e ouça.</p></div>
+      <div class="diferencial-item"><span class="diferencial-icon">🛡️</span><div class="diferencial-title">Hardware Robusto</div><p class="diferencial-desc">Sensores calibrados, protegidos e testados para o ambiente externo. Alimentação estabilizada contra surtos.</p></div>
     </div>
   </div>
 </section>
-<!-- PLANOS -->
 <section id="planos">
   <div class="section-inner">
     <div class="section-label">// PLANOS</div>
@@ -962,7 +497,6 @@
     </div>
   </div>
 </section>
-<!-- LOJA -->
 <section id="loja">
   <div class="section-inner">
     <div class="section-label">// LOJA</div>
@@ -970,88 +504,24 @@
     <p class="section-desc">Selecione os itens desejados e finalize seu pedido. Nossa equipe entrará em contato para confirmar instalação.</p>
     <div class="loja-grid">
       <div class="loja-produtos" id="lojaProdutos">
-        <div class="loja-item">
-          <span class="loja-item-icon">🌱</span>
-          <div class="loja-item-info">
-            <div class="loja-item-name">VentraSense Agro — Hardware</div>
-            <div class="loja-item-desc">Estação completa: temp/umidade, vento, chuva, RTC, microSD + instalação</div>
-          </div>
-          <div class="loja-item-price">
-            R$ 800<small>hardware único</small>
-          </div>
-          <button class="btn-add" onclick="addToCart(this,'VentraSense Agro Hardware','R$ 800','hardware')">+ ADICIONAR</button>
-        </div>
-        <div class="loja-item">
-          <span class="loja-item-icon">✈️</span>
-          <div class="loja-item-info">
-            <div class="loja-item-name">VentraSense Aero — Hardware</div>
-            <div class="loja-item-desc">Estação completa para aeródromo com todos os sensores + ATIS + instalação</div>
-          </div>
-          <div class="loja-item-price">
-            R$ 1.200<small>hardware único</small>
-          </div>
-          <button class="btn-add" onclick="addToCart(this,'VentraSense Aero Hardware','R$ 1.200','hardware')">+ ADICIONAR</button>
-        </div>
-        <div class="loja-item">
-          <span class="loja-item-icon">📊</span>
-          <div class="loja-item-info">
-            <div class="loja-item-name">Plano Starter — Dashboard</div>
-            <div class="loja-item-desc">Acesso completo ao dashboard, alertas e histórico. Cobrado mensalmente.</div>
-          </div>
-          <div class="loja-item-price">
-            R$ 79<small>/mês — recorrente</small>
-          </div>
-          <button class="btn-add" onclick="addToCart(this,'Plano Starter','R$ 79/mês','plano')">+ ADICIONAR</button>
-        </div>
-        <div class="loja-item">
-          <span class="loja-item-icon">🚀</span>
-          <div class="loja-item-info">
-            <div class="loja-item-name">Plano Pro — Dashboard + ATIS</div>
-            <div class="loja-item-desc">Tudo do Starter + ATIS por voz e suporte prioritário. Para aeródromos.</div>
-          </div>
-          <div class="loja-item-price">
-            R$ 129<small>/mês — recorrente</small>
-          </div>
-          <button class="btn-add" onclick="addToCart(this,'Plano Pro','R$ 129/mês','plano')">+ ADICIONAR</button>
-        </div>
-        <div class="loja-item">
-          <span class="loja-item-icon">🔧</span>
-          <div class="loja-item-info">
-            <div class="loja-item-name">Instalação e Configuração</div>
-            <div class="loja-item-desc">Visita técnica, instalação dos sensores e configuração completa do sistema.</div>
-          </div>
-          <div class="loja-item-price">
-            R$ 350<small>serviço único</small>
-          </div>
-          <button class="btn-add" onclick="addToCart(this,'Instalação e Configuração','R$ 350','servico')">+ ADICIONAR</button>
-        </div>
+        <div class="loja-item"><span class="loja-item-icon">🌱</span><div class="loja-item-info"><div class="loja-item-name">VentraSense Agro — Hardware</div><div class="loja-item-desc">Estação completa: temp/umidade, vento, chuva, RTC, microSD + instalação</div></div><div class="loja-item-price">R$ 800<small>hardware único</small></div><button class="btn-add" onclick="addToCart(this,'VentraSense Agro Hardware','R$ 800','hardware')">+ ADICIONAR</button></div>
+        <div class="loja-item"><span class="loja-item-icon">✈️</span><div class="loja-item-info"><div class="loja-item-name">VentraSense Aero — Hardware</div><div class="loja-item-desc">Estação completa para aeródromo com todos os sensores + ATIS + instalação</div></div><div class="loja-item-price">R$ 1.200<small>hardware único</small></div><button class="btn-add" onclick="addToCart(this,'VentraSense Aero Hardware','R$ 1.200','hardware')">+ ADICIONAR</button></div>
+        <div class="loja-item"><span class="loja-item-icon">📊</span><div class="loja-item-info"><div class="loja-item-name">Plano Starter — Dashboard</div><div class="loja-item-desc">Acesso completo ao dashboard, alertas e histórico. Cobrado mensalmente.</div></div><div class="loja-item-price">R$ 79<small>/mês — recorrente</small></div><button class="btn-add" onclick="addToCart(this,'Plano Starter','R$ 79/mês','plano')">+ ADICIONAR</button></div>
+        <div class="loja-item"><span class="loja-item-icon">🚀</span><div class="loja-item-info"><div class="loja-item-name">Plano Pro — Dashboard + ATIS</div><div class="loja-item-desc">Tudo do Starter + ATIS por voz e suporte prioritário. Para aeródromos.</div></div><div class="loja-item-price">R$ 129<small>/mês — recorrente</small></div><button class="btn-add" onclick="addToCart(this,'Plano Pro','R$ 129/mês','plano')">+ ADICIONAR</button></div>
+        <div class="loja-item"><span class="loja-item-icon">🔧</span><div class="loja-item-info"><div class="loja-item-name">Instalação e Configuração</div><div class="loja-item-desc">Visita técnica, instalação dos sensores e configuração completa do sistema.</div></div><div class="loja-item-price">R$ 350<small>serviço único</small></div><button class="btn-add" onclick="addToCart(this,'Instalação e Configuração','R$ 350','servico')">+ ADICIONAR</button></div>
       </div>
-      <!-- CARRINHO -->
       <div class="carrinho">
-        <div class="carrinho-header">
-          <span>// CARRINHO</span>
-          <div class="carrinho-badge" id="cartBadge">0</div>
-        </div>
-        <div class="carrinho-items" id="cartItems">
-          <div class="carrinho-empty" id="cartEmpty">Nenhum item adicionado</div>
-        </div>
+        <div class="carrinho-header"><span>// CARRINHO</span><div class="carrinho-badge" id="cartBadge">0</div></div>
+        <div class="carrinho-items" id="cartItems"><div class="carrinho-empty" id="cartEmpty">Nenhum item adicionado</div></div>
         <div class="carrinho-footer">
-          <div class="carrinho-total">
-            <span class="carrinho-total-label">TOTAL HARDWARE</span>
-            <span class="carrinho-total-val" id="cartTotal">R$ 0</span>
-          </div>
-          <div class="carrinho-mensalidade" id="cartMensalidade" style="display:none">
-            <span id="cartMensalidadeVal"></span>
-          </div>
-          <button class="btn-checkout" id="btnCheckout" disabled onclick="openModal(event,'checkout')">
-            FINALIZAR PEDIDO
-          </button>
+          <div class="carrinho-total"><span class="carrinho-total-label">TOTAL HARDWARE</span><span class="carrinho-total-val" id="cartTotal">R$ 0</span></div>
+          <div class="carrinho-mensalidade" id="cartMensalidade" style="display:none"><span id="cartMensalidadeVal"></span></div>
+          <button class="btn-checkout" id="btnCheckout" disabled onclick="openModal(event,'checkout')">FINALIZAR PEDIDO</button>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- CONTATO -->
 <section id="contato">
   <div class="section-inner">
     <div class="section-label">// CONTATO</div>
@@ -1059,39 +529,20 @@
     <div class="contato-grid reveal">
       <div class="contato-info">
         <p>Tem dúvidas sobre qual estação é ideal para sua propriedade ou aeródromo? Nossa equipe técnica está pronta para ajudar.</p>
-        <div class="contato-item">
-          <div class="contato-item-icon">📧</div>
-          <div>
-            <div class="contato-item-label">E-MAIL</div>
-            <div class="contato-item-val">contato@ventrasense.com.br</div>
-          </div>
-        </div>
-        <div class="contato-item">
-          <div class="contato-item-icon">📍</div>
-          <div>
-            <div class="contato-item-label">LOCALIZAÇÃO</div>
-            <div class="contato-item-val">Brasil</div>
-          </div>
-        </div>
-        <div class="contato-item">
-          <div class="contato-item-icon">⏱️</div>
-          <div>
-            <div class="contato-item-label">RESPOSTA</div>
-            <div class="contato-item-val">Em até 24 horas úteis</div>
-          </div>
-        </div>
+        <div class="contato-item"><div class="contato-item-icon">📧</div><div><div class="contato-item-label">E-MAIL</div><div class="contato-item-val">contato@ventrasense.com.br</div></div></div>
+        <div class="contato-item"><div class="contato-item-icon">📍</div><div><div class="contato-item-label">LOCALIZAÇÃO</div><div class="contato-item-val">Brasil</div></div></div>
+        <div class="contato-item"><div class="contato-item-icon">⏱️</div><div><div class="contato-item-label">RESPOSTA</div><div class="contato-item-val">Em até 24 horas úteis</div></div></div>
       </div>
       <div class="contato-form">
         <input type="text" class="form-input" placeholder="Seu nome"/>
         <input type="email" class="form-input" placeholder="Seu e-mail"/>
         <input type="text" class="form-input" placeholder="Assunto (ex: Orçamento Agro, Dúvida Aero...)"/>
-        <textarea class="contato-form" placeholder="Sua mensagem..."></textarea>
+        <textarea placeholder="Sua mensagem..."></textarea>
         <button class="btn-enviar">ENVIAR MENSAGEM</button>
       </div>
     </div>
   </div>
 </section>
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -1113,6 +564,7 @@
         <li><a href="#diferenciais">Diferenciais</a></li>
         <li><a href="#contato">Contato</a></li>
         <li><a href="#" onclick="openModal(event,'login')">Área do Cliente</a></li>
+        <li><a href="/privacidade.html">Política de Privacidade</a></li>
       </ul>
     </div>
   </div>
@@ -1121,7 +573,6 @@
     <span class="footer-copy">ventrasense.com.br</span>
   </div>
 </footer>
-<!-- MODAL LOGIN/CHECKOUT -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -1133,165 +584,44 @@
         <button class="form-tab" onclick="switchTab(this,'cadastro')">Solicitar Acesso</button>
       </div>
       <div id="tabLogin">
-        <div class="form-group">
-          <label class="form-label">Usuário</label>
-          <input type="text" class="form-input" placeholder="seu-usuario"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Senha</label>
-          <input type="password" class="form-input" placeholder="••••••••"/>
-        </div>
+        <div class="form-group"><label class="form-label">Usuário</label><input type="text" class="form-input" placeholder="seu-usuario"/></div>
+        <div class="form-group"><label class="form-label">Senha</label><input type="password" class="form-input" placeholder="••••••••"/></div>
         <button class="btn-login" onclick="goToDashboard()">ACESSAR DASHBOARD</button>
       </div>
       <div id="tabCadastro" style="display:none">
-        <div class="form-group">
-          <label class="form-label">Nome</label>
-          <input type="text" class="form-input" placeholder="Seu nome completo"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">E-mail</label>
-          <input type="email" class="form-input" placeholder="seu@email.com"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tipo de Operação</label>
-          <input type="text" class="form-input" placeholder="Agronegócio / Aeródromo / Outro"/>
-        </div>
+        <div class="form-group"><label class="form-label">Nome</label><input type="text" class="form-input" placeholder="Seu nome completo"/></div>
+        <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" placeholder="seu@email.com"/></div>
+        <div class="form-group"><label class="form-label">Tipo de Operação</label><input type="text" class="form-input" placeholder="Agronegócio / Aeródromo / Outro"/></div>
         <button class="btn-login">SOLICITAR ACESSO</button>
       </div>
     </div>
     <div id="modalCheckoutContent" style="display:none">
       <div class="modal-title">// PEDIDO</div>
       <div class="modal-heading">Finalizar Pedido</div>
-      <p style="color:var(--text-dim);font-size:0.9rem;line-height:1.7;margin-bottom:24px">
-        Após confirmar, nossa equipe entrará em contato em até 24h para agendar a instalação e processar o pagamento.
-      </p>
-      <div class="form-group">
-        <label class="form-label">Nome completo</label>
-        <input type="text" class="form-input" placeholder="Seu nome"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">E-mail</label>
-        <input type="email" class="form-input" placeholder="seu@email.com"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">WhatsApp</label>
-        <input type="text" class="form-input" placeholder="(00) 00000-0000"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Localidade / Propriedade</label>
-        <input type="text" class="form-input" placeholder="Cidade - Estado"/>
-      </div>
+      <p style="color:var(--text-dim);font-size:0.9rem;line-height:1.7;margin-bottom:24px">Após confirmar, nossa equipe entrará em contato em até 24h para agendar a instalação e processar o pagamento.</p>
+      <div class="form-group"><label class="form-label">Nome completo</label><input type="text" class="form-input" placeholder="Seu nome"/></div>
+      <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" placeholder="seu@email.com"/></div>
+      <div class="form-group"><label class="form-label">WhatsApp</label><input type="text" class="form-input" placeholder="(00) 00000-0000"/></div>
+      <div class="form-group"><label class="form-label">Localidade / Propriedade</label><input type="text" class="form-input" placeholder="Cidade - Estado"/></div>
       <button class="btn-login">CONFIRMAR PEDIDO</button>
     </div>
   </div>
 </div>
 <script>
-  // NAV HAMBURGER
-  document.getElementById('hamburger').addEventListener('click', () => {
-    document.getElementById('navLinks').classList.toggle('open');
-  });
-  // SCROLL REVEAL
+  document.getElementById('hamburger').addEventListener('click', () => { document.getElementById('navLinks').classList.toggle('open'); });
   const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.1 });
+  const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.1 });
   reveals.forEach(r => observer.observe(r));
-  // MODAL
-  function openModal(e, type) {
-    e.preventDefault();
-    document.getElementById('modalOverlay').classList.add('open');
-    if(type === 'checkout') {
-      document.getElementById('modalLoginContent').style.display = 'none';
-      document.getElementById('modalCheckoutContent').style.display = 'block';
-    } else {
-      document.getElementById('modalLoginContent').style.display = 'block';
-      document.getElementById('modalCheckoutContent').style.display = 'none';
-    }
-  }
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('open');
-  }
-  function closeModalOutside(e) {
-    if(e.target === document.getElementById('modalOverlay')) closeModal();
-  }
-  function switchTab(btn, tab) {
-    document.querySelectorAll('.form-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tabLogin').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('tabCadastro').style.display = tab === 'cadastro' ? 'block' : 'none';
-  }
-  function goToDashboard() {
-    window.open('https://estacao-meteorologica.onrender.com', '_blank');
-  }
-  // CARRINHO
-  let cart = [];
-  function addToCart(btn, name, price, type) {
-    if(btn.classList.contains('added')) return;
-    btn.classList.add('added');
-    btn.textContent = '✓ ADICIONADO';
-    cart.push({ name, price, type });
-    renderCart();
-  }
-  function removeFromCart(idx) {
-    const item = cart[idx];
-    cart.splice(idx, 1);
-    renderCart();
-    // Re-enable add button for removed item
-    document.querySelectorAll('.btn-add.added').forEach((btn) => {
-      const itemName = btn.closest('.loja-item').querySelector('.loja-item-name').textContent;
-      if(itemName === item.name) {
-        btn.classList.remove('added');
-        btn.textContent = '+ ADICIONAR';
-      }
-    });
-  }
-  function renderCart() {
-    const container = document.getElementById('cartItems');
-    const empty = document.getElementById('cartEmpty');
-    const badge = document.getElementById('cartBadge');
-    const totalEl = document.getElementById('cartTotal');
-    const mensalidadeEl = document.getElementById('cartMensalidade');
-    const mensalidadeValEl = document.getElementById('cartMensalidadeVal');
-    const btnCheckout = document.getElementById('btnCheckout');
-    badge.textContent = cart.length;
-    Array.from(container.querySelectorAll('.carrinho-item')).forEach(e => e.remove());
-    if(cart.length === 0) {
-      empty.style.display = 'block';
-      totalEl.textContent = 'R$ 0';
-      mensalidadeEl.style.display = 'none';
-      btnCheckout.disabled = true;
-      return;
-    }
-    empty.style.display = 'none';
-    btnCheckout.disabled = false;
-    let totalHardware = 0;
-    let mensalidades = [];
-    cart.forEach((item, idx) => {
-      const div = document.createElement('div');
-      div.className = 'carrinho-item';
-      div.innerHTML = `
-        <span class="carrinho-item-name">${item.name}</span>
-        <span class="carrinho-item-price">${item.price}</span>
-        <button class="carrinho-item-remove" onclick="removeFromCart(${idx})">✕</button>
-      `;
-      container.appendChild(div);
-      if(item.type !== 'plano') {
-        const num = parseInt(item.price.replace(/[^\d]/g,''));
-        totalHardware += num;
-      } else {
-        mensalidades.push(item.price);
-      }
-    });
-    totalEl.textContent = totalHardware > 0 ? `R$ ${totalHardware.toLocaleString('pt-BR')}` : 'R$ 0';
-    if(mensalidades.length > 0) {
-      mensalidadeEl.style.display = 'block';
-      mensalidadeValEl.textContent = `+ ${mensalidades.join(' + ')} (recorrente)`;
-    } else {
-      mensalidadeEl.style.display = 'none';
-    }
-  }
-  // ESC to close modal
-  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+  function openModal(e, type) { e.preventDefault(); document.getElementById('modalOverlay').classList.add('open'); if(type==='checkout'){document.getElementById('modalLoginContent').style.display='none';document.getElementById('modalCheckoutContent').style.display='block';}else{document.getElementById('modalLoginContent').style.display='block';document.getElementById('modalCheckoutContent').style.display='none';} }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+  function closeModalOutside(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+  function switchTab(btn,tab) { document.querySelectorAll('.form-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('tabLogin').style.display=tab==='login'?'block':'none'; document.getElementById('tabCadastro').style.display=tab==='cadastro'?'block':'none'; }
+  function goToDashboard() { window.open('https://estacao-meteorologica.onrender.com','_blank'); }
+  let cart=[];
+  function addToCart(btn,name,price,type){if(btn.classList.contains('added'))return;btn.classList.add('added');btn.textContent='✓ ADICIONADO';cart.push({name,price,type});renderCart();}
+  function removeFromCart(idx){const item=cart[idx];cart.splice(idx,1);renderCart();document.querySelectorAll('.btn-add.added').forEach((btn)=>{const itemName=btn.closest('.loja-item').querySelector('.loja-item-name').textContent;if(itemName===item.name){btn.classList.remove('added');btn.textContent='+ ADICIONAR';}});}
+  function renderCart(){const container=document.getElementById('cartItems');const empty=document.getElementById('cartEmpty');const badge=document.getElementById('cartBadge');const totalEl=document.getElementById('cartTotal');const mensalidadeEl=document.getElementById('cartMensalidade');const mensalidadeValEl=document.getElementById('cartMensalidadeVal');const btnCheckout=document.getElementById('btnCheckout');badge.textContent=cart.length;Array.from(container.querySelectorAll('.carrinho-item')).forEach(e=>e.remove());if(cart.length===0){empty.style.display='block';totalEl.textContent='R$ 0';mensalidadeEl.style.display='none';btnCheckout.disabled=true;return;}empty.style.display='none';btnCheckout.disabled=false;let totalHardware=0;let mensalidades=[];cart.forEach((item,idx)=>{const div=document.createElement('div');div.className='carrinho-item';div.innerHTML=`<span class="carrinho-item-name">${item.name}</span><span class="carrinho-item-price">${item.price}</span><button class="carrinho-item-remove" onclick="removeFromCart(${idx})">✕</button>`;container.appendChild(div);if(item.type!=='plano'){const num=parseInt(item.price.replace(/[^\d]/g,''));totalHardware+=num;}else{mensalidades.push(item.price);}});totalEl.textContent=totalHardware>0?`R$ ${totalHardware.toLocaleString('pt-BR')}`:'R$ 0';if(mensalidades.length>0){mensalidadeEl.style.display='block';mensalidadeValEl.textContent=`+ ${mensalidades.join(' + ')} (recorrente)`;}else{mensalidadeEl.style.display='none';}}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 </script>
 </body>
 </html>
