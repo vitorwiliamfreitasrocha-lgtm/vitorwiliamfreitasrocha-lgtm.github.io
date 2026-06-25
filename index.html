@@ -1,654 +1,795 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VentraSense — Monitoramento Meteorológico Inteligente</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:      oklch(0.10 0.025 245);
-      --bg2:     oklch(0.14 0.022 245);
-      --bg3:     oklch(0.18 0.020 242);
-      --surface: oklch(0.16 0.022 245);
-      --border:  oklch(0.26 0.030 245);
-      --text:    oklch(0.95 0.008 245);
-      --muted:   oklch(0.58 0.012 245);
-      --cyan:    oklch(0.78 0.17 200);
-      --cyan-glow: oklch(0.78 0.17 200 / 0.18);
-      --amber:   oklch(0.78 0.16 65);
-      --green:   oklch(0.74 0.16 155);
-      --head:    'Space Grotesk', sans-serif;
-      --mono:    'Space Mono', monospace;
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VentraSense — Estações Meteorológicas | Do Plantio ao Pouso</title>
+<meta name="description" content="Estações meteorológicas profissionais com telemetria a cada 10 segundos, alertas automáticos e ATIS por voz. Para o agronegócio e operações aeronáuticas."/>
+<meta name="theme-color" content="#04090f"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="shortcut icon" href="favicon.svg"/>
+<meta property="og:title" content="VentraSense — Do plantio ao pouso"/>
+<meta property="og:description" content="Telemetria meteorológica em tempo real para o agro e a aviação. Estações profissionais, dashboard na nuvem e ATIS por voz."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://ventrasense.com.br/"/>
+<meta property="og:locale" content="pt_BR"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "VentraSense",
+  "url": "https://ventrasense.com.br",
+  "email": "contato@ventrasense.com.br",
+  "description": "Estações meteorológicas inteligentes para o agronegócio e operações aeronáuticas.",
+  "makesOffer": [
+    { "@type": "Offer", "name": "VentraSense Agro", "price": "7000", "priceCurrency": "BRL" },
+    { "@type": "Offer", "name": "VentraSense Aero", "price": "9000", "priceCurrency": "BRL" }
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg:        #04090f;
+    --bg2:       #070f1a;
+    --bg3:       #0a1622;
+    --card:      #0c1a2c;
+    --card-hi:   #0f2238;
+    --line:      #13283f;
+    --line-hi:   #1d3c5e;
+    --cyan:      #00d2ff;
+    --cyan-dim:  #0a4a66;
+    --cyan-soft: rgba(0,210,255,0.08);
+    --green:     #00ff9d;
+    --green-dim: #064430;
+    --green-soft:rgba(0,255,157,0.07);
+    --amber:     #ffb340;
+    --text:      #cfe2f3;
+    --muted:     #54748f;
+    --white:     #f2f8fd;
+    --font:      'Space Grotesk', sans-serif;
+    --mono:      'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 86px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--cyan); color: var(--bg); }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--cyan-dim); border-radius: 2px; }
+  a, button { cursor: pointer; }
+
+  /* grão de ruído global */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; opacity: 0.5;
+  }
+
+  /* ============ NAV ============ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 0 4vw; height: 70px;
+    background: rgba(4,9,15,0.82);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; flex-shrink: 0; }
+  .nav-logo-text { font-size: 1.12rem; font-weight: 700; letter-spacing: 3.5px; color: var(--white); }
+  .nav-logo-text b { color: var(--cyan); font-weight: 700; }
+  .nav-instruments { display: flex; align-items: center; gap: 22px; font-family: var(--mono); font-size: 0.68rem; letter-spacing: 1.5px; color: var(--muted); }
+  .nav-instruments .val { color: var(--cyan); }
+  .nav-instruments .alt-val { color: var(--green); }
+  .nav-links { display: flex; align-items: center; gap: 26px; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase;
+    font-family: var(--mono); transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+  .nav-links a.nav-dash {
+    color: var(--green); border: 1px solid rgba(0,255,157,0.3);
+    padding: 8px 16px; background: var(--green-soft); transition: all 0.2s;
+  }
+  .nav-links a.nav-dash:hover { background: var(--green); color: var(--bg); }
+  .nav-links a.nav-cta {
+    color: var(--cyan); border: 1px solid var(--cyan-dim);
+    padding: 8px 16px; transition: all 0.2s;
+  }
+  .nav-links a.nav-cta:hover { background: var(--cyan); color: var(--bg); }
+  .nav-burger { display: none; background: none; border: 1px solid var(--line); color: var(--cyan); font-size: 1.2rem; padding: 6px 12px; }
+
+  /* ============ HERO ============ */
+  #hero {
+    position: relative; min-height: 100svh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 110px 5vw 60px; overflow: hidden;
+    cursor: crosshair;
+  }
+  #fx { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero-gridlines {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(0,210,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(0,210,255,0.035) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 45%, #000 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 45%, #000 30%, transparent 100%);
+  }
+  .hero-content { position: relative; z-index: 2; text-align: center; max-width: 980px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 0.66rem; letter-spacing: 4px; color: var(--cyan);
+    border: 1px solid var(--cyan-dim); padding: 8px 18px; margin-bottom: 36px;
+    background: var(--cyan-soft); animation: fadeUp 0.8s ease both;
+  }
+  .hero-badge::after { content: '█'; animation: blink 1.1s steps(1) infinite; font-size: 0.6rem; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .hero-title {
+    font-size: clamp(3.2rem, 9.5vw, 7rem); font-weight: 700; line-height: 0.98;
+    letter-spacing: -2px; color: var(--white);
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .hero-title .t-agro { color: var(--green); text-shadow: 0 0 60px rgba(0,255,157,0.35); }
+  .hero-title .t-aero { color: var(--cyan); text-shadow: 0 0 60px rgba(0,210,255,0.35); }
+  .hero-sub {
+    margin: 28px auto 0; font-size: clamp(1rem, 1.6vw, 1.18rem); color: var(--muted);
+    line-height: 1.75; max-width: 640px; font-weight: 300;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+  .hero-btns { margin-top: 44px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.8s 0.3s ease both; }
+  .btn-primary {
+    background: var(--cyan); color: var(--bg); border: none; padding: 16px 38px;
+    font-family: var(--font); font-weight: 700; font-size: 0.84rem;
+    letter-spacing: 2.5px; text-transform: uppercase; text-decoration: none; display: inline-block;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(0,210,255,0.45); }
+  .btn-ghost {
+    background: transparent; color: var(--text); border: 1px solid var(--line-hi);
+    padding: 16px 38px; font-family: var(--font); font-weight: 500;
+    font-size: 0.84rem; letter-spacing: 2.5px; text-transform: uppercase;
+    text-decoration: none; display: inline-block; transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-soft); }
+  .hero-dash-box {
+    position: relative; z-index: 2; margin: 38px auto 0;
+    display: flex; align-items: center; gap: 20px;
+    background: rgba(0,255,157,0.04); border: 1px solid rgba(0,255,157,0.22);
+    padding: 18px 26px; max-width: 660px; width: 100%;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  .pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: livePulse 2s infinite; }
+  @keyframes livePulse {
+    0% { box-shadow: 0 0 0 0 rgba(0,255,157,0.5); }
+    70% { box-shadow: 0 0 0 12px rgba(0,255,157,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,255,157,0); }
+  }
+  .hero-dash-info { flex: 1; text-align: left; }
+  .hero-dash-label { display: block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 3px; color: var(--green); margin-bottom: 4px; }
+  .hero-dash-text { font-size: 0.9rem; color: var(--text); }
+  .btn-dash {
+    background: var(--green); color: var(--bg); border: none; padding: 12px 22px;
+    font-family: var(--font); font-weight: 700; font-size: 0.76rem;
+    letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+    white-space: nowrap; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-dash:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,255,157,0.4); }
+  .hero-stats {
+    position: relative; z-index: 2;
+    display: flex; gap: clamp(28px, 6vw, 80px); margin-top: 70px; padding-top: 36px;
+    border-top: 1px solid var(--line); animation: fadeUp 0.8s 0.5s ease both;
+  }
+  .hstat { text-align: center; }
+  .hstat-n { font-size: 1.9rem; font-weight: 700; color: var(--cyan); font-family: var(--mono); }
+  .hstat-n.g { color: var(--green); }
+  .hstat-l { font-size: 0.62rem; letter-spacing: 2.5px; color: var(--muted); text-transform: uppercase; margin-top: 6px; font-family: var(--mono); }
+
+  /* ============ TICKER METAR ============ */
+  .ticker-strip {
+    position: relative; z-index: 5;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    background: #060d16; overflow: hidden; padding: 12px 0;
+  }
+  .ticker-track { display: inline-flex; white-space: nowrap; will-change: transform; animation: tickmove 46s linear infinite; }
+  @keyframes tickmove { to { transform: translateX(-50%); } }
+  .ticker-track .ti { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 2px; color: var(--muted); padding: 0 20px; }
+  .ticker-track .ti b { color: var(--cyan); font-weight: 400; }
+  .ticker-track .ti .ok { color: var(--green); }
+  .ticker-track .sep { color: var(--cyan-dim); font-size: 0.6rem; align-self: center; }
+
+  /* ============ SEÇÕES ============ */
+  section { position: relative; z-index: 1; }
+  .inner { max-width: 1240px; margin: 0 auto; padding: 110px 5vw; }
+  .s-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 5px; color: var(--cyan); text-transform: uppercase; margin-bottom: 14px; }
+  .s-title { font-size: clamp(2rem, 4.4vw, 3.2rem); font-weight: 700; color: var(--white); line-height: 1.06; margin-bottom: 20px; letter-spacing: -1px; }
+  .s-desc { font-size: 1rem; color: var(--muted); max-width: 580px; line-height: 1.8; }
+  .reveal { opacity: 0; transform: translateY(34px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* cantos HUD */
+  .hud { position: relative; }
+  .hud::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+    background:
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 0 0 / 16px 2px,
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 0 0 / 2px 16px,
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 100% 0 / 16px 2px,
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 100% 0 / 2px 16px,
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 0 100% / 16px 2px,
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 0 100% / 2px 16px,
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 100% 100% / 16px 2px,
+      linear-gradient(var(--hud, var(--cyan)), var(--hud, var(--cyan))) 100% 100% / 2px 16px;
+    background-repeat: no-repeat;
+    opacity: 0.55;
+  }
+
+  /* ============ TELEMETRIA (DEMO) ============ */
+  #telemetria { background: var(--bg2); }
+  .tele-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .sim-chip {
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 3px;
+    color: var(--amber); border: 1px solid rgba(255,179,64,0.35);
+    background: rgba(255,179,64,0.07); padding: 7px 14px; white-space: nowrap;
+  }
+  .tele-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 22px; margin-top: 52px; align-items: stretch; }
+
+  .cluster {
+    --hud: var(--cyan-dim);
+    background: var(--card); border: 1px solid var(--line); padding: 26px;
+    display: grid; gap: 14px;
+    grid-template-columns: minmax(220px, 300px) 1fr 1fr;
+    grid-template-areas:
+      "compass temp hum"
+      "compass qnh rain"
+      "status status status";
+  }
+  .gauge { background: var(--bg2); border: 1px solid var(--line); padding: 18px 20px; position: relative; overflow: hidden; }
+  .gauge-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2.5px; color: var(--muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .gauge-val { font-family: var(--mono); font-size: 1.9rem; font-weight: 700; color: var(--white); line-height: 1; }
+  .gauge-val small { font-size: 0.85rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
+  .gauge-sub { font-family: var(--mono); font-size: 0.64rem; color: var(--muted); margin-top: 10px; letter-spacing: 1px; }
+  .gauge-sub b { color: var(--green); font-weight: 400; }
+  .trend { font-size: 0.9rem; }
+  .trend.up { color: var(--green); }
+  .trend.dn { color: var(--cyan); }
+
+  .g-compass { grid-area: compass; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 22px; }
+  .g-temp { grid-area: temp; }
+  .g-hum { grid-area: hum; }
+  .g-qnh { grid-area: qnh; }
+  .g-rain { grid-area: rain; }
+  .g-status { grid-area: status; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+
+  .compass-svg { width: 100%; max-width: 235px; height: auto; display: block; }
+  .compass-digital { margin-top: 14px; text-align: center; font-family: var(--mono); }
+  .compass-digital .kt { font-size: 2.1rem; font-weight: 700; color: var(--cyan); }
+  .compass-digital .kt small { font-size: 0.8rem; color: var(--muted); }
+  .compass-digital .dir { font-size: 0.7rem; letter-spacing: 2px; color: var(--muted); margin-top: 4px; }
+  .compass-digital .dir b { color: var(--white); font-weight: 700; }
+  #needle { transform-origin: 110px 110px; transition: transform 1.5s cubic-bezier(0.2, 0.65, 0.25, 1); }
+
+  .bar-track { height: 5px; background: var(--line); margin-top: 12px; position: relative; overflow: hidden; }
+  .bar-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 50%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); transition: width 0.9s ease; }
+  .bar-fill.g { background: linear-gradient(90deg, var(--green-dim), var(--green)); }
+  .spark { width: 100%; height: 34px; margin-top: 10px; display: block; }
+  .spark polyline { fill: none; stroke: var(--cyan); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+  .spark .area { fill: rgba(0,210,255,0.07); stroke: none; }
+
+  .mod-list { display: flex; gap: 18px; flex-wrap: wrap; }
+  .mod { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.64rem; letter-spacing: 1.5px; color: var(--muted); }
+  .mod i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(0,255,157,0.6); }
+  .mod.rx-led i { transition: transform 0.2s; }
+  .mod.rx-led.on i { transform: scale(1.6); background: #fff; box-shadow: 0 0 14px var(--green); }
+  .rx-info { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 1.5px; color: var(--muted); }
+  .rx-info b { color: var(--green); font-weight: 400; }
+
+  /* ATIS console */
+  .atis {
+    --hud: rgba(0,210,255,0.5);
+    background: #081120; border: 1px solid var(--line); display: flex; flex-direction: column;
+  }
+  .atis-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 22px; border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: 0.66rem; letter-spacing: 3px; color: var(--cyan);
+  }
+  .onair { display: flex; align-items: center; gap: 8px; font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; }
+  .onair i { width: 8px; height: 8px; border-radius: 50%; background: var(--line-hi); }
+  .atis.speaking .onair { color: var(--amber); }
+  .atis.speaking .onair i { background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: blink 0.9s steps(1) infinite; }
+  .atis-body { flex: 1; padding: 22px; position: relative; }
+  .atis-body::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.014) 0 1px, transparent 1px 3px);
+  }
+  .atis-text {
+    font-family: var(--mono); font-size: 0.78rem; line-height: 2; letter-spacing: 1px;
+    color: var(--green); white-space: pre-wrap; min-height: 270px; margin: 0;
+    text-shadow: 0 0 12px rgba(0,255,157,0.25);
+  }
+  .atis-text .caret { animation: blink 0.9s steps(1) infinite; }
+  .atis-bars { display: flex; gap: 5px; align-items: flex-end; height: 26px; padding: 0 22px 4px; }
+  .atis-bars span { width: 5px; height: 4px; background: var(--cyan-dim); transition: height 0.2s; }
+  .atis.speaking .atis-bars span { background: var(--cyan); animation: barjump 0.6s ease-in-out infinite alternate; }
+  .atis.speaking .atis-bars span:nth-child(2n) { animation-delay: 0.12s; }
+  .atis.speaking .atis-bars span:nth-child(3n) { animation-delay: 0.22s; }
+  .atis.speaking .atis-bars span:nth-child(5n) { animation-delay: 0.3s; }
+  @keyframes barjump { from { height: 4px; } to { height: 24px; } }
+  .atis-foot { padding: 18px 22px 22px; border-top: 1px solid var(--line); }
+  .atis-btns { display: flex; gap: 10px; }
+  .btn-atis {
+    flex: 1; background: var(--cyan); color: var(--bg); border: none; padding: 13px;
+    font-family: var(--font); font-weight: 700; font-size: 0.74rem; letter-spacing: 2.5px;
+    text-transform: uppercase; transition: opacity 0.2s, box-shadow 0.2s;
+  }
+  .btn-atis:hover { box-shadow: 0 6px 22px rgba(0,210,255,0.35); }
+  .btn-atis:disabled { opacity: 0.25; cursor: not-allowed; box-shadow: none; }
+  .btn-atis.stop { background: transparent; border: 1px solid var(--line-hi); color: var(--muted); flex: 0 0 auto; padding: 13px 20px; }
+  .btn-atis.stop:hover { border-color: var(--amber); color: var(--amber); }
+  .atis-note { font-size: 0.68rem; color: var(--muted); margin-top: 14px; line-height: 1.6; font-family: var(--mono); letter-spacing: 0.5px; }
+
+  /* ============ PRODUTOS ============ */
+  #produtos { background: var(--bg); }
+  .prod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 56px; }
+  .prod {
+    background: var(--card); padding: 54px 48px; position: relative; overflow: hidden;
+    border: 1px solid var(--line); transition: transform 0.3s, border-color 0.3s;
+  }
+  .prod:hover { transform: translateY(-4px); border-color: var(--line-hi); }
+  .prod::after {
+    content: ''; position: absolute; left: -10%; right: -10%; height: 70px; top: -110px;
+    background: linear-gradient(180deg, transparent, var(--sweep, rgba(0,210,255,0.06)), transparent);
+    transform: rotate(4deg); transition: top 1s ease; pointer-events: none;
+  }
+  .prod:hover::after { top: 115%; }
+  .prod.agro { --hud: rgba(0,255,157,0.5); --sweep: rgba(0,255,157,0.06); }
+  .prod.aero { --hud: rgba(0,210,255,0.5); }
+  .prod-icon { width: 52px; height: 52px; margin-bottom: 24px; }
+  .prod-icon svg { width: 100%; height: 100%; }
+  .prod-tag {
+    display: inline-block; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 3px;
+    padding: 5px 14px; margin-bottom: 20px;
+  }
+  .prod.agro .prod-tag { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,157,0.25); }
+  .prod.aero .prod-tag { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,210,255,0.25); }
+  .prod-title { font-size: 1.9rem; font-weight: 700; color: var(--white); margin-bottom: 16px; letter-spacing: -0.5px; }
+  .prod-desc { color: var(--muted); line-height: 1.8; margin-bottom: 30px; font-size: 0.95rem; }
+  .prod-feats { list-style: none; margin-bottom: 36px; }
+  .prod-feats li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 0.88rem; display: flex; align-items: center; gap: 12px; color: var(--text); }
+  .prod-feats li::before { content: '▸'; font-size: 0.6rem; }
+  .prod.agro .prod-feats li::before { color: var(--green); }
+  .prod.aero .prod-feats li::before { color: var(--cyan); }
+  .prod-price { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; }
+  .prod-price strong { font-size: 1.5rem; color: var(--white); margin-right: 6px; font-weight: 700; }
+  .prod-note { margin-top: 10px; font-size: 0.72rem; color: var(--muted); opacity: 0.85; }
+  .prod-bg { position: absolute; right: -16px; bottom: -50px; font-size: 13rem; font-weight: 700; opacity: 0.025; color: #fff; font-family: var(--mono); pointer-events: none; user-select: none; }
+
+  /* ============ FLUXO / COMO FUNCIONA ============ */
+  #fluxo { background: var(--bg3); }
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin-top: 64px; }
+  .pnode { flex: 1; background: var(--card); border: 1px solid var(--line); padding: 32px 26px; position: relative; transition: border-color 0.3s, background 0.3s; }
+  .pnode:hover { border-color: var(--cyan-dim); background: var(--card-hi); }
+  .pnode-num { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 3px; color: var(--cyan); margin-bottom: 16px; }
+  .pnode-icon { width: 34px; height: 34px; margin-bottom: 16px; }
+  .pnode-icon svg { width: 100%; height: 100%; stroke: var(--cyan); fill: none; stroke-width: 1.5; }
+  .pnode:last-child .pnode-icon svg { stroke: var(--green); }
+  .pnode-title { font-size: 1.02rem; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+  .pnode-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+  .pipe { flex: 0 0 64px; position: relative; align-self: center; height: 2px; margin: 0 -1px; z-index: 2;
+    background: repeating-linear-gradient(90deg, var(--cyan-dim) 0 7px, transparent 7px 14px);
+    animation: pipeflow 0.9s linear infinite;
+  }
+  @keyframes pipeflow { to { background-position: 14px 0; } }
+  .pipe .pkt {
+    position: absolute; top: 50%; left: 0; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 10px var(--green);
+    transform: translate(-50%, -50%); animation: pktmove 2.2s ease-in-out infinite;
+  }
+  .pipe:nth-of-type(4) .pkt { animation-delay: 0.7s; }
+  .pipe:nth-of-type(6) .pkt { animation-delay: 1.4s; }
+  @keyframes pktmove { 0% { left: 0; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+  /* ============ DIFERENCIAIS ============ */
+  #diferenciais { background: var(--bg2); }
+  .dif-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 56px; background: var(--line); border: 1px solid var(--line); }
+  .dif { background: var(--bg2); padding: 42px 36px; transition: background 0.3s; position: relative; }
+  .dif:hover { background: var(--card); }
+  .dif:hover .dif-num { color: var(--cyan); }
+  .dif-num { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 3px; color: var(--cyan-dim); margin-bottom: 18px; transition: color 0.3s; }
+  .dif-title { font-size: 1.06rem; font-weight: 700; color: var(--white); margin-bottom: 12px; letter-spacing: 0.3px; }
+  .dif-desc { font-size: 0.87rem; color: var(--muted); line-height: 1.75; }
+
+  /* ============ PLANOS ============ */
+  #planos { background: var(--bg); }
+  .planos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
+  .plano { background: var(--card); padding: 44px 36px; position: relative; border: 1px solid var(--line); transition: transform 0.3s, border-color 0.3s; }
+  .plano:hover { transform: translateY(-5px); }
+  .plano.destaque { border-color: var(--green); background: linear-gradient(160deg, #0c1a2c 0%, #0c2433 100%); }
+  .plano.destaque:hover { box-shadow: 0 18px 50px rgba(0,255,157,0.1); }
+  .plano-tag {
+    position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+    background: var(--green); color: var(--bg); font-family: var(--mono);
+    font-size: 0.58rem; letter-spacing: 3px; padding: 5px 16px; white-space: nowrap; font-weight: 700;
+  }
+  .plano-nome { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; margin-bottom: 20px; }
+  .plano-preco { font-size: 2.3rem; font-weight: 700; color: var(--white); margin-bottom: 6px; letter-spacing: -1px; }
+  .plano-preco span { font-size: 1rem; color: var(--muted); font-weight: 300; letter-spacing: 0; }
+  .plano-hw { font-size: 0.78rem; color: var(--muted); margin-bottom: 26px; padding-bottom: 26px; border-bottom: 1px solid var(--line); font-family: var(--mono); letter-spacing: 0.5px; }
+  .plano-feats { list-style: none; margin-bottom: 36px; }
+  .plano-feats li { padding: 8px 0; font-size: 0.87rem; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .plano-feats .y { color: var(--green); font-size: 0.78rem; }
+  .plano-feats .n { color: var(--muted); font-size: 0.78rem; }
+  .btn-plano {
+    display: block; text-align: center; text-decoration: none; padding: 13px;
+    font-weight: 700; font-size: 0.76rem; letter-spacing: 2.5px; text-transform: uppercase;
+    border: 1px solid var(--line-hi); color: var(--text); transition: all 0.2s; font-family: var(--font);
+  }
+  .btn-plano:hover { background: var(--cyan); color: var(--bg); border-color: var(--cyan); }
+  .plano.destaque .btn-plano { background: var(--green); color: var(--bg); border-color: var(--green); }
+  .plano.destaque .btn-plano:hover { box-shadow: 0 8px 26px rgba(0,255,157,0.35); }
+
+  /* ============ PROPOSTA / LOJA ============ */
+  #loja { background: var(--bg3); }
+  .loja-grid { display: grid; grid-template-columns: 1fr 370px; gap: 32px; margin-top: 56px; align-items: start; }
+  .loja-list { display: flex; flex-direction: column; gap: 14px; }
+  .loja-item {
+    background: var(--card); border: 1px solid var(--line); padding: 26px 30px;
+    display: flex; align-items: center; gap: 22px; transition: border-color 0.2s, transform 0.2s;
+  }
+  .loja-item:hover { border-color: var(--cyan-dim); transform: translateX(4px); }
+  .loja-ico { width: 40px; height: 40px; flex-shrink: 0; }
+  .loja-ico svg { width: 100%; height: 100%; }
+  .loja-info { flex: 1; }
+  .loja-name { font-weight: 700; color: var(--white); margin-bottom: 5px; font-size: 0.96rem; }
+  .loja-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+  .loja-price { font-family: var(--mono); font-size: 1rem; color: var(--cyan); white-space: nowrap; text-align: right; }
+  .loja-price small { display: block; font-size: 0.62rem; color: var(--muted); margin-top: 3px; }
+  .btn-add {
+    background: transparent; border: 1px solid var(--cyan-dim); color: var(--cyan);
+    padding: 9px 16px; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 2px;
+    white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+  }
+  .btn-add:hover { background: var(--cyan); color: var(--bg); }
+  .btn-add.added { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .carrinho { --hud: rgba(0,210,255,0.45); background: var(--card); border: 1px solid var(--line); position: sticky; top: 92px; }
+  .car-head { padding: 18px 26px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 0.7rem; letter-spacing: 3px; color: var(--cyan); display: flex; align-items: center; justify-content: space-between; }
+  .car-badge { background: var(--cyan); color: var(--bg); min-width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; }
+  .car-items { min-height: 110px; padding: 18px 26px; }
+  .car-empty { font-size: 0.78rem; color: var(--muted); text-align: center; padding: 28px 0; font-family: var(--mono); letter-spacing: 1px; }
+  .car-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 0.82rem; }
+  .car-item-name { color: var(--text); flex: 1; }
+  .car-item-price { color: var(--cyan); font-family: var(--mono); font-size: 0.76rem; white-space: nowrap; }
+  .car-item-rm { background: none; border: none; color: var(--muted); font-size: 0.8rem; padding: 0 4px; transition: color 0.2s; }
+  .car-item-rm:hover { color: #ff5566; }
+  .car-foot { padding: 20px 26px; border-top: 1px solid var(--line); }
+  .car-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .car-total-l { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 2px; color: var(--muted); }
+  .car-total-v { font-family: var(--mono); font-size: 1.15rem; color: var(--white); font-weight: 700; }
+  .car-mens { font-size: 0.72rem; color: var(--muted); margin-bottom: 18px; padding: 10px 12px; background: var(--cyan-soft); border: 1px solid var(--line); font-family: var(--mono); letter-spacing: 0.5px; }
+  .btn-checkout {
+    display: block; width: 100%; text-align: center; background: var(--cyan); color: var(--bg);
+    border: none; padding: 15px; font-family: var(--font); font-weight: 700; font-size: 0.78rem;
+    letter-spacing: 3px; text-transform: uppercase; transition: opacity 0.2s, box-shadow 0.2s;
+  }
+  .btn-checkout:hover { box-shadow: 0 8px 26px rgba(0,210,255,0.35); }
+  .btn-checkout:disabled { opacity: 0.25; cursor: not-allowed; box-shadow: none; }
+
+  /* ============ CONTATO ============ */
+  #contato { background: var(--bg2); }
+  .cont-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; margin-top: 56px; align-items: start; }
+  .cont-info p { color: var(--muted); line-height: 1.8; margin-bottom: 36px; }
+  .cont-item { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 22px; }
+  .cont-ico { width: 42px; height: 42px; flex-shrink: 0; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+  .cont-ico svg { width: 18px; height: 18px; stroke: var(--cyan); fill: none; stroke-width: 1.5; }
+  .cont-label { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2.5px; color: var(--muted); margin-bottom: 4px; }
+  .cont-val { font-size: 0.94rem; color: var(--text); }
+  .cont-form { display: flex; flex-direction: column; gap: 14px; }
+  .input {
+    width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--text);
+    padding: 13px 16px; font-family: var(--mono); font-size: 0.86rem; outline: none; transition: border-color 0.2s;
+  }
+  .input:focus { border-color: var(--cyan); }
+  .input::placeholder { color: var(--muted); opacity: 0.7; }
+  textarea.input { height: 130px; resize: vertical; font-family: var(--font); }
+  .btn-send {
+    background: transparent; border: 1px solid var(--cyan); color: var(--cyan);
+    padding: 14px 38px; font-family: var(--font); font-weight: 700; font-size: 0.78rem;
+    letter-spacing: 3px; text-transform: uppercase; transition: all 0.2s; align-self: flex-start;
+  }
+  .btn-send:hover { background: var(--cyan); color: var(--bg); }
+
+  /* ============ FOOTER ============ */
+  footer { background: var(--bg); border-top: 1px solid var(--line); padding: 64px 5vw 36px; }
+  .foot-inner { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
+  .foot-brand p { font-size: 0.86rem; color: var(--muted); line-height: 1.7; margin-top: 16px; max-width: 320px; }
+  .foot-col h4 { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 4px; color: var(--cyan); text-transform: uppercase; margin-bottom: 20px; }
+  .foot-col ul { list-style: none; }
+  .foot-col ul li { margin-bottom: 10px; }
+  .foot-col ul li a { color: var(--muted); text-decoration: none; font-size: 0.86rem; transition: color 0.2s; }
+  .foot-col ul li a:hover { color: var(--text); }
+  .foot-bottom { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 26px; }
+  .foot-copy { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2px; color: var(--muted); }
+  .foot-status { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2px; color: var(--green); display: flex; align-items: center; gap: 8px; }
+  .foot-status i { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: livePulse 2.4s infinite; }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(4,9,15,0.92); backdrop-filter: blur(10px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal { --hud: rgba(0,210,255,0.5); background: var(--bg2); border: 1px solid var(--line); padding: 46px; width: 100%; max-width: 450px; position: relative; animation: fadeUp 0.3s ease both; max-height: 92vh; overflow-y: auto; }
+  .modal-close { position: absolute; top: 14px; right: 18px; background: none; border: none; color: var(--muted); font-size: 1.15rem; transition: color 0.2s; }
+  .modal-close:hover { color: var(--cyan); }
+  .modal-label { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 4px; color: var(--cyan); margin-bottom: 8px; }
+  .modal-title { font-size: 1.55rem; font-weight: 700; color: var(--white); margin-bottom: 28px; }
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 3px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+  .form-tabs { display: flex; margin-bottom: 26px; border-bottom: 1px solid var(--line); }
+  .form-tab { padding: 10px 20px; background: none; border: none; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 2px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
+  .form-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+  .btn-modal { width: 100%; padding: 14px; background: var(--cyan); color: var(--bg); border: none; font-family: var(--font); font-weight: 700; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; transition: opacity 0.2s; margin-top: 6px; }
+  .btn-modal:hover { opacity: 0.88; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ============ RESPONSIVO ============ */
+  @media (max-width: 1080px) {
+    .tele-grid { grid-template-columns: 1fr; }
+    .cluster { grid-template-columns: 1fr 1fr; grid-template-areas: "compass compass" "temp hum" "qnh rain" "status status"; }
+    .compass-svg { max-width: 220px; }
+  }
+  @media (max-width: 960px) {
+    .nav-instruments { display: none; }
+    .nav-links { display: none; }
+    .nav-burger { display: block; }
+    .nav-links.open {
+      display: flex; flex-direction: column; align-items: flex-start;
+      position: absolute; top: 70px; left: 0; right: 0;
+      background: var(--bg2); padding: 24px 5vw; gap: 20px; border-bottom: 1px solid var(--line);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); font-family: var(--head); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-    a { color: inherit; text-decoration: none; }
-    button { font-family: var(--head); cursor: pointer; }
+    .prod-grid, .planos-grid, .cont-grid { grid-template-columns: 1fr; }
+    .loja-grid { grid-template-columns: 1fr; }
+    .carrinho { position: static; }
+    .dif-grid { grid-template-columns: 1fr 1fr; }
+    .foot-inner { grid-template-columns: 1fr; gap: 40px; }
+    .pipeline { flex-direction: column; }
+    .pipe { flex: 0 0 46px; width: 2px; height: 46px; align-self: center; margin: -1px 0;
+      background: repeating-linear-gradient(180deg, var(--cyan-dim) 0 7px, transparent 7px 14px);
+      animation: pipeflowv 0.9s linear infinite; }
+    @keyframes pipeflowv { to { background-position: 0 14px; } }
+    .pipe .pkt { animation: pktmovev 2.2s ease-in-out infinite; left: 50%; top: 0; }
+    @keyframes pktmovev { 0% { top: 0; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+  }
+  @media (max-width: 620px) {
+    .dif-grid { grid-template-columns: 1fr; }
+    .cluster { grid-template-columns: 1fr; grid-template-areas: "compass" "temp" "hum" "qnh" "rain" "status"; padding: 16px; }
+    .hero-stats { flex-wrap: wrap; justify-content: center; }
+    .hero-btns { flex-direction: column; align-items: stretch; }
+    .hero-dash-box { flex-direction: column; text-align: center; }
+    .hero-dash-info { text-align: center; }
+    .prod { padding: 38px 26px; }
+    .loja-item { flex-wrap: wrap; }
+    .modal { padding: 34px 24px; }
+  }
 
-    /* noise */
-    body::after { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity:.03; pointer-events:none; z-index:9000; }
-
-    /* ── NAV ─────────────────────────────── */
-    nav {
-      position: fixed; top:0; left:0; right:0; z-index:500;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px; height: 64px;
-      transition: background .35s, border-color .35s, backdrop-filter .35s;
-      border-bottom: 1px solid transparent;
-    }
-    nav.scrolled { background: oklch(0.10 0.025 245 / 0.92); border-color: var(--border); backdrop-filter: blur(20px); }
-    .logo { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:700; letter-spacing:.04em; }
-    .logo .logo-text { color: var(--text) !important; }
-    .logo .logo-text > span { color: var(--cyan) !important; }
-    .logo-icon { width:30px; height:30px; border:1.5px solid var(--cyan); border-radius:7px; display:flex; align-items:center; justify-content:center; }
-    .logo-icon svg { width:16px; height:16px; }
-    .nav-links { display:flex; gap:28px; font-size:13px; font-weight:500; letter-spacing:.03em; }
-    .nav-links a { color:var(--muted); transition:color .2s; text-transform:uppercase; letter-spacing:.07em; font-size:12px; }
-    .nav-links a:hover { color:var(--text); }
-    .nav-right { display:flex; gap:10px; align-items:center; }
-    .btn-nav-ghost { border:1px solid var(--border); color:var(--muted); padding:8px 16px; border-radius:6px; font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; transition:all .2s; }
-    .btn-nav-ghost:hover { color:var(--text); border-color:var(--text); }
-    .btn-nav-fill { background:var(--cyan); color:var(--bg); padding:8px 18px; border-radius:6px; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; transition:all .2s; }
-    .btn-nav-fill:hover { opacity:.85; }
-    /* theme toggle */
-    .btn-theme { width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; font-size:16px; }
-    .btn-theme:hover { border-color:var(--cyan); color:var(--cyan); }
-
-    /* ── LIGHT MODE ─────────────────────── */
-    body.light {
-      --bg:      oklch(0.99 0.004 240);
-      --bg2:     oklch(0.95 0.007 235);
-      --bg3:     oklch(0.91 0.010 232);
-      --surface: oklch(0.93 0.008 235);
-      --border:  oklch(0.82 0.014 230);
-      --text:    oklch(0.16 0.030 245);
-      --muted:   oklch(0.48 0.020 240);
-      --cyan:    oklch(0.52 0.17 210);
-      --cyan-glow: oklch(0.52 0.17 210 / 0.14);
-      --amber:   oklch(0.58 0.16 60);
-      --green:   oklch(0.52 0.16 155);
-    }
-    body.light nav { background: oklch(0.99 0.004 240 / 0.0); }
-    body.light nav.scrolled { background: oklch(0.99 0.004 240 / 0.95); border-color: var(--border); }
-    body.light .btn-nav-ghost { border-color: var(--border); color: var(--muted); }
-    body.light .hero { background: linear-gradient(160deg, oklch(0.99 0.004 240), oklch(0.94 0.012 225)); }
-    body.light .hero h1 { color: var(--text); }
-    body.light .hero-ticker { background: var(--bg2); }
-    body.light .stats-bar, body.light .stat-item { background: var(--bg2); }
-    body.light .prod-card { background: var(--bg); box-shadow: 0 2px 16px oklch(0 0 0 / .06); }
-    body.light .prod-card.aero { background: linear-gradient(145deg, oklch(0.93 0.018 215), oklch(0.96 0.010 235)); }
-    body.light .plan-card { background: var(--bg); box-shadow: 0 2px 16px oklch(0 0 0 / .06); }
-    body.light .plan-card.featured { background: linear-gradient(145deg, oklch(0.88 0.035 210), oklch(0.93 0.018 235)); border-color: var(--cyan); }
-    body.light .plan-card.featured * { color: inherit; }
-    body.light .plan-features li { color: var(--text); }
-    body.light .ind-cta-inner { background: linear-gradient(135deg, oklch(0.93 0.040 60), oklch(0.96 0.010 240)); border-color: oklch(0.58 0.16 60 / 0.3); }
-    body.light .ind-how-card { background: var(--bg); }
-    body.light .ind-case { background: var(--bg); box-shadow: 0 2px 12px oklch(0 0 0 / .05); }
-    body.light .dep-card { background: var(--bg); box-shadow: 0 2px 16px oklch(0 0 0 / .06); }
-    body.light .prop-item { background: var(--bg); }
-    body.light .prop-summary { background: var(--bg); }
-    body.light .tech-visual { background: var(--bg); }
-    body.light .dash-topbar { background: var(--bg2); }
-    body.light .dash-tile { background: var(--bg2); }
-    body.light .dash-chart { background: var(--bg2); }
-    body.light .chart-bar { background: var(--bg3); }
-    body.light .video-wrap { background: var(--bg2); }
-    body.light .cta-section { background: linear-gradient(135deg, oklch(0.90 0.030 220), oklch(0.94 0.015 240)); }
-    body.light footer { background: var(--bg2); }
-    body.light .sensor-card, body.light .sc { background: var(--bg); }
-    body.light .rr { border-color: var(--cyan); opacity: .25; }
-    body.light .rsweep { background: linear-gradient(90deg, var(--cyan), transparent); opacity:.6; }
-    body.light body::after { opacity: .01; }
-    body.light #tweaks-panel { background: var(--bg); }
-    body.light .spec-chip, body.light .dif-cell { background: var(--bg); }
-    body.light .hstat { background: var(--bg2); }
-    body.light .plan-price { color: var(--text); }
-    body.light .btn-plan.ghost { color: var(--text); border-color: var(--border); }
-    body.light .btn-plan.ghost:hover { border-color: var(--cyan); color: var(--cyan); }
-    body.light .nav-links a { color: var(--muted); }
-    body.light .nav-links a:hover { color: var(--text); }
-
-    /* ── HERO ────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column; justify-content: center;
-      padding: 100px 60px 60px;
-      position: relative; overflow: hidden;
-    }
-    /* radar bg */
-    .radar { position:absolute; right:-60px; top:50%; transform:translateY(-50%); width:680px; height:680px; pointer-events:none; }
-    .rr { position:absolute; border-radius:50%; border:1px solid var(--cyan); top:50%; left:50%; transform:translate(-50%,-50%); animation:rpulse 4s ease-out infinite; }
-    .rr:nth-child(1){width:140px;height:140px;animation-delay:0s}
-    .rr:nth-child(2){width:260px;height:260px;animation-delay:.7s}
-    .rr:nth-child(3){width:390px;height:390px;animation-delay:1.4s}
-    .rr:nth-child(4){width:530px;height:530px;animation-delay:2.1s}
-    .rr:nth-child(5){width:680px;height:680px;animation-delay:2.8s}
-    @keyframes rpulse{0%,100%{opacity:.45}50%{opacity:.08}}
-    .rsweep { position:absolute; top:50%; left:50%; width:340px; height:2px; transform-origin:0 50%; background:linear-gradient(90deg,var(--cyan),transparent); animation:rspin 6s linear infinite; }
-    @keyframes rspin{to{transform:rotate(360deg)}}
-
-    .hero-badge { display:inline-flex; align-items:center; gap:8px; background:oklch(.78 .17 200/.1); border:1px solid oklch(.78 .17 200/.3); color:var(--cyan); padding:5px 14px; border-radius:100px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; margin-bottom:28px; width:fit-content; animation: fup .8s both; }
-    .badge-dot { width:6px; height:6px; border-radius:50%; background:var(--cyan); animation:blink 1.6s ease infinite; }
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-
-    .hero h1 { font-size:clamp(52px,7vw,96px); font-weight:700; line-height:1; letter-spacing:-3px; margin-bottom:24px; animation:fup .8s .1s both; max-width: 700px; }
-    .hero h1 em { font-style:normal; color:var(--cyan); }
-    .hero-desc { font-size:17px; color:var(--muted); line-height:1.7; max-width:480px; margin-bottom:40px; animation:fup .8s .2s both; }
-    .hero-actions { display:flex; gap:14px; align-items:center; margin-bottom:72px; animation:fup .8s .3s both; }
-    .btn-primary { background:var(--cyan); color:var(--bg); padding:14px 30px; border-radius:8px; font-size:14px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; border:none; transition:all .2s; }
-    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 12px 36px oklch(.78 .17 200/.35); }
-    .btn-outline { border:1px solid var(--border); color:var(--text); padding:13px 28px; border-radius:8px; font-size:14px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; background:transparent; transition:all .2s; }
-    .btn-outline:hover { border-color:var(--cyan); color:var(--cyan); }
-
-    /* hero stats */
-    .hero-stats { display:flex; gap:0; border:1px solid var(--border); border-radius:14px; background:var(--bg2); overflow:hidden; width:fit-content; animation:fup .8s .45s both; }
-    .hstat { padding:18px 36px; border-right:1px solid var(--border); }
-    .hstat:last-child { border-right:none; }
-    .hstat .hn { font-family:var(--mono); font-size:28px; font-weight:700; color:var(--cyan); letter-spacing:-1px; }
-    .hstat .hl { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
-
-    /* live ticker */
-    /* floating cards */
-    .hero-cards { position:absolute; right:60px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:14px; animation:fup .8s .5s both; z-index:3; }
-    .sc { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:18px 22px; width:214px; position:relative; overflow:hidden; backdrop-filter:blur(12px); }
-    .sc::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
-    .sc.c::before { background:var(--cyan); }
-    .sc.a::before { background:var(--amber); }
-    .sc.g::before { background:var(--green); }
-    .sc .slabel { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
-    .sc .sval { font-family:var(--mono); font-size:28px; font-weight:700; letter-spacing:-1px; line-height:1; }
-    .sc.c .sval { color:var(--cyan); } .sc.a .sval { color:var(--amber); } .sc.g .sval { color:var(--green); }
-    .sc .sunit { font-size:13px; font-weight:400; opacity:.55; }
-    .sc .ssub { font-size:11px; color:var(--muted); margin-top:8px; display:flex; align-items:center; gap:6px; }
-    .trend { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; }
-    .trend.up { background:oklch(.74 .16 155/.15); color:var(--green); }
-    .trend.dn { background:oklch(.78 .16 65/.15); color:var(--amber); }
-    .spark { margin-top:12px; height:32px; width:100%; }
-    @media(max-width:1100px){ .hero-cards{display:none} }
-
-    .hero-ticker { position:absolute; bottom:0; left:0; right:0; border-top:1px solid var(--border); background:var(--bg2); overflow:hidden; }
-    .ticker-track { display:flex; animation:tickscroll 35s linear infinite; width:max-content; }
-    .ticker-item { padding:12px 36px; border-right:1px solid var(--border); font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; align-items:center; gap:10px; white-space:nowrap; }
-    .ticker-item .td { color:var(--cyan); }
-    @keyframes tickscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    @keyframes fup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-    /* ── SECTION commons ─────────────────── */
-    section { padding: 96px 60px; }
-    .stag { display:inline-flex; align-items:center; gap:10px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); margin-bottom:18px; }
-    .stag::before { content:'//'; opacity:.5; }
-    h2.sh { font-size:clamp(36px,4.5vw,58px); font-weight:700; letter-spacing:-2px; line-height:1.05; margin-bottom:20px; }
-    p.sd { font-size:16px; color:var(--muted); line-height:1.7; max-width:520px; }
-
-    /* reveal */
-    .rv { opacity:0; transform:translateY(28px); transition:opacity .65s ease, transform .65s ease; }
-    .rv.vis { opacity:1; transform:none; }
-    .rv2 { transition-delay:.12s; } .rv3 { transition-delay:.24s; } .rv4 { transition-delay:.36s; }
-
-    /* ── PRODUCTS ────────────────────────── */
-    #produtos { background:var(--bg2); }
-    .prod-header { margin-bottom:56px; }
-    .prod-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
-
-    .prod-card {
-      background:var(--bg);
-      border:1px solid var(--border);
-      border-radius:20px;
-      overflow:hidden;
-      transition:all .3s;
-    }
-    .prod-card:hover { transform:translateY(-5px); }
-    .prod-card.agro:hover { border-color:var(--green); box-shadow:0 20px 60px oklch(.74 .16 155/.12); }
-    .prod-card.aero:hover { border-color:var(--cyan); box-shadow:0 20px 60px oklch(.78 .17 200/.14); }
-
-    .prod-top { padding:36px 36px 28px; border-bottom:1px solid var(--border); }
-    .prod-icon { font-size:36px; margin-bottom:18px; }
-    .prod-cat { font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; padding:4px 10px; border-radius:4px; display:inline-block; margin-bottom:14px; }
-    .prod-cat.agro { background:oklch(.74 .16 155/.15); color:var(--green); }
-    .prod-cat.aero { background:oklch(.78 .17 200/.12); color:var(--cyan); }
-    .prod-name { font-size:28px; font-weight:700; letter-spacing:-1px; margin-bottom:10px; }
-    .prod-desc { font-size:14px; color:var(--muted); line-height:1.65; }
-
-    .prod-features { padding:28px 36px; border-bottom:1px solid var(--border); }
-    .prod-features ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
-    .prod-features li { font-size:14px; color:oklch(.75 .01 245); display:flex; align-items:flex-start; gap:10px; }
-    .prod-features li::before { content:'·'; color:var(--cyan); font-weight:700; flex-shrink:0; margin-top:1px; }
-    .prod-card.agro .prod-features li::before { color:var(--green); }
-
-    .prod-footer { padding:24px 36px; display:flex; align-items:center; justify-content:space-between; }
-    .prod-price .pv { font-family:var(--mono); font-size:26px; font-weight:700; letter-spacing:-1px; }
-    .prod-price .ps { font-size:13px; color:var(--muted); }
-    .prod-price .pm { font-size:13px; color:var(--muted); margin-top:3px; }
-
-    /* ── VIDEO ───────────────────────────── */
-    #video { background:var(--bg); }
-    .video-wrap {
-      margin-top:48px;
-      border:1px solid var(--border);
-      border-radius:16px;
-      aspect-ratio:16/7;
-      background:var(--bg2);
-      display:flex; align-items:center; justify-content:center;
-      position:relative; overflow:hidden;
-      cursor:pointer;
-      transition:border-color .25s;
-    }
-    .video-wrap:hover { border-color:var(--cyan); }
-    .video-wrap::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,oklch(.78 .17 200/.04),transparent,oklch(.78 .17 200/.04)); }
-    /* corner brackets */
-    .video-wrap::after { content:''; position:absolute; inset:16px; border:1px solid var(--border); pointer-events:none; clip-path:polygon(0 0,20px 0,20px 1px,1px 1px,1px 20px,0 20px, 0 0, 100% 0,100% 0, calc(100% - 20px) 0,calc(100% - 20px) 1px,calc(100% - 1px) 1px,calc(100% - 1px) 20px,100% 20px,100% 0,100% 100%,100% calc(100% - 20px),calc(100% - 1px) calc(100% - 20px),calc(100% - 1px) calc(100% - 1px),calc(100% - 20px) calc(100% - 1px),calc(100% - 20px) 100%,0 100%,20px 100%,20px calc(100% - 1px),1px calc(100% - 1px),1px calc(100% - 20px),0 calc(100% - 20px)); }
-    .play-btn { width:64px; height:64px; border:1.5px solid var(--cyan); border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; z-index:1; transition:all .2s; }
-    .play-btn:hover { background:var(--cyan-glow); transform:scale(1.08); }
-    .play-btn svg { margin-left:4px; }
-    .video-label { position:absolute; bottom:28px; font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
-
-    /* ── DIFERENCIAIS ────────────────────── */
-    #diferenciais { background:var(--bg2); }
-    .dif-header { margin-bottom:56px; }
-    .dif-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; border:1px solid var(--border); border-radius:16px; overflow:hidden; }
-    .dif-cell { background:var(--bg); padding:36px 32px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); transition:background .2s; }
-    .dif-cell:hover { background:var(--bg3); }
-    .dif-cell:nth-child(3n) { border-right:none; }
-    .dif-cell:nth-child(n+4) { border-bottom:none; }
-    .dif-icon { font-size:28px; margin-bottom:18px; display:block; }
-    .dif-title { font-size:16px; font-weight:700; letter-spacing:-.3px; margin-bottom:8px; }
-    .dif-desc { font-size:13px; color:var(--muted); line-height:1.65; }
-
-    /* ── PLANOS ──────────────────────────── */
-    #planos { background:var(--bg); }
-    .planos-header { margin-bottom:56px; }
-    .planos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-    .plan-card { background:var(--bg2); border:1px solid var(--border); border-radius:18px; padding:32px; position:relative; transition:all .3s; }
-    .plan-card:hover { transform:translateY(-4px); }
-    .plan-card.featured { border-color:var(--cyan); background:linear-gradient(145deg,oklch(.14 .04 210),oklch(.12 .025 245)); }
-    .plan-badge { position:absolute; top:-1px; left:50%; transform:translateX(-50%); background:var(--cyan); color:var(--bg); font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:4px 14px; border-radius:0 0 8px 8px; }
-    .plan-name { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
-    .plan-price { font-family:var(--mono); font-size:40px; font-weight:700; letter-spacing:-2px; line-height:1; margin-bottom:6px; }
-    .plan-price.cyan { color:var(--cyan); }
-    .plan-period { font-size:13px; color:var(--muted); margin-bottom:8px; }
-    .plan-hw { font-size:12px; color:var(--muted); padding:8px 12px; background:var(--bg3); border-radius:6px; margin-bottom:28px; }
-    .plan-hw span { color:var(--text); font-weight:600; }
-    .plan-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
-    .plan-features li { font-size:14px; color:oklch(.72 .01 245); display:flex; align-items:center; gap:10px; }
-    .plan-features li.yes::before { content:'✓'; color:var(--cyan); font-weight:700; }
-    .plan-features li.no { opacity:.4; }
-    .plan-features li.no::before { content:'—'; color:var(--muted); }
-    .btn-plan { width:100%; padding:13px; border-radius:8px; font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; border:none; transition:all .2s; }
-    .btn-plan.fill { background:var(--cyan); color:var(--bg); }
-    .btn-plan.fill:hover { box-shadow:0 8px 24px oklch(.78 .17 200/.3); }
-    .btn-plan.ghost { background:transparent; border:1px solid var(--border); color:var(--text); }
-    .btn-plan.ghost:hover { border-color:var(--cyan); color:var(--cyan); }
-
-    /* ── PROPOSTA ────────────────────────── */
-    #proposta { background:var(--bg2); }
-    .proposta-inner { display:grid; grid-template-columns:1fr 340px; gap:28px; margin-top:48px; }
-    .prop-items { display:flex; flex-direction:column; gap:0; border:1px solid var(--border); border-radius:16px; overflow:hidden; }
-    .prop-item { display:grid; grid-template-columns:52px 1fr auto auto; align-items:center; gap:20px; padding:24px 28px; border-bottom:1px solid var(--border); background:var(--bg); transition:background .2s; }
-    .prop-item:last-child { border-bottom:none; }
-    .prop-item:hover { background:var(--bg3); }
-    .prop-item-icon { font-size:26px; }
-    .prop-item-info .pi-name { font-size:15px; font-weight:600; letter-spacing:-.2px; margin-bottom:4px; }
-    .prop-item-info .pi-desc { font-size:12px; color:var(--muted); line-height:1.5; }
-    .prop-item-price { font-family:var(--mono); font-size:16px; font-weight:700; white-space:nowrap; }
-    .prop-item-price small { font-size:11px; font-weight:400; color:var(--muted); display:block; }
-    .btn-add { background:transparent; border:1px solid var(--border); color:var(--muted); padding:8px 16px; border-radius:6px; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; transition:all .2s; white-space:nowrap; }
-    .btn-add:hover, .btn-add.active { background:var(--cyan); border-color:var(--cyan); color:var(--bg); }
-
-    .prop-summary { background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:28px; height:fit-content; position:sticky; top:84px; }
-    .ps-tag { font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; }
-    .ps-tag .ps-dot { width:8px; height:8px; border-radius:50%; background:var(--cyan); animation:blink 1.5s ease infinite; }
-    .ps-items { min-height:80px; margin-bottom:20px; }
-    .ps-item { display:flex; justify-content:space-between; align-items:flex-start; font-size:13px; padding:10px 0; border-bottom:1px solid var(--border); gap:12px; }
-    .ps-item:last-child { border-bottom:none; }
-    .ps-item-name { color:var(--muted); }
-    .ps-item-val { font-family:var(--mono); font-weight:700; white-space:nowrap; }
-    .ps-empty { font-size:13px; color:var(--muted); text-align:center; padding:20px 0; }
-    .ps-divider { border:none; border-top:1px solid var(--border); margin:16px 0; }
-    .ps-total { display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-bottom:6px; }
-    .ps-total .pt-val { font-family:var(--mono); color:var(--cyan); }
-    .ps-monthly { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:20px; }
-    .ps-monthly .pm-val { font-family:var(--mono); }
-    .btn-solicitar { width:100%; padding:14px; background:var(--cyan); color:var(--bg); border:none; border-radius:8px; font-size:14px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; transition:all .2s; }
-    .btn-solicitar:hover { box-shadow:0 10px 30px oklch(.78 .17 200/.3); }
-    .btn-solicitar:disabled { opacity:.35; cursor:not-allowed; box-shadow:none; }
-
-    /* ── INDUSTRIAL ─────────────────────── */
-    #industrial { background:var(--bg2); }
-    .ind-case-grid {
-      display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
-    }
-    .ind-case {
-      background:var(--bg); border:1px solid var(--border);
-      border-radius:14px; padding:26px;
-      transition:all .25s;
-    }
-    .ind-case:hover { transform:translateY(-3px); border-color:oklch(.78 .16 65/.4); }
-    .ind-case-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:14px; }
-    .ind-case-name { font-size:15px; font-weight:700; letter-spacing:-.2px; margin-bottom:6px; }
-    .ind-case-desc { font-size:13px; color:var(--muted); line-height:1.6; }
-
-    .ind-how-grid {
-      display:grid; grid-template-columns:repeat(4,1fr); gap:0;
-      border:1px solid var(--border); border-radius:14px; overflow:hidden;
-    }
-    .ind-how-card {
-      background:var(--bg); padding:28px 24px;
-      border-right:1px solid var(--border);
-      position:relative;
-    }
-    .ind-how-card:last-child { border-right:none; }
-    .ihc-num {
-      font-family:var(--mono); font-size:11px; font-weight:700;
-      letter-spacing:.1em; color:var(--amber); margin-bottom:12px;
-    }
-    .ihc-title { font-size:15px; font-weight:700; letter-spacing:-.2px; margin-bottom:8px; }
-    .ihc-desc { font-size:13px; color:var(--muted); line-height:1.6; }
-
-    .ind-cta-inner {
-      background:linear-gradient(135deg, oklch(.14 .035 60), oklch(.12 .025 245));
-      border:1px solid oklch(.78 .16 65/.25);
-      border-radius:16px; padding:36px 40px;
-      display:flex; align-items:center; justify-content:space-between; gap:32px;
-    }
-    .ind-cta-title { font-size:20px; font-weight:700; letter-spacing:-.4px; margin-bottom:6px; }
-    .ind-cta-desc { font-size:14px; color:var(--muted); line-height:1.6; }
-    .ind-cta-actions { display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex-shrink:0; }
-    .ind-price { font-size:13px; color:var(--muted); }
-    .ind-price strong { color:var(--amber); }
-
-    @media(max-width:900px){
-      .ind-case-grid { grid-template-columns:1fr 1fr; }
-      .ind-how-grid { grid-template-columns:1fr 1fr; }
-      .ind-how-card { border-bottom:1px solid var(--border); }
-      .ind-cta-inner { flex-direction:column; align-items:flex-start; }
-      .ind-cta-actions { align-items:flex-start; }
-    }
-
-    /* ── MAPA ────────────────────────────── */
-    #mapa { background:var(--bg2); }
-    .mapa-header { margin-bottom:40px; }
-    .mapa-wrap {
-      position:relative; border-radius:20px; overflow:hidden;
-      border:1px solid var(--border);
-      box-shadow:0 30px 80px oklch(0 0 0/.4);
-    }
-    .mapa-wrap iframe { display:block; width:100%; height:520px; border:none; }
-    .mapa-legend {
-      position:absolute; top:20px; left:20px;
-      background:oklch(0.10 0.025 245 / 0.92);
-      border:1px solid var(--border);
-      border-radius:12px; padding:14px 18px;
-      backdrop-filter:blur(16px);
-      display:flex; flex-direction:column; gap:8px;
-      z-index:10; pointer-events:none;
-    }
-    .mapa-legend .ml-title { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
-    .ml-item { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
-    .ml-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-    .mapa-badge {
-      position:absolute; bottom:20px; right:20px;
-      background:oklch(0.10 0.025 245 / 0.88);
-      border:1px solid var(--border);
-      border-radius:8px; padding:8px 14px;
-      font-family:var(--mono); font-size:10px; color:var(--muted);
-      backdrop-filter:blur(12px);
-      display:flex; align-items:center; gap:8px;
-      z-index:10; pointer-events:none;
-    }
-    .mapa-badge .live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 1.5s ease infinite; }
-
-    /* ── DEPOIMENTOS ─────────────────────── */
-    #depoimentos { background:var(--bg); }
-    .dep-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:48px; }
-    .dep-card {
-      background:var(--bg2); border:1px solid var(--border);
-      border-radius:18px; padding:32px;
-      display:flex; flex-direction:column; gap:20px;
-      transition:all .3s;
-    }
-    .dep-card:hover { border-color:var(--border); transform:translateY(-4px); box-shadow:0 16px 50px oklch(0 0 0/.25); }
-    .dep-stars { color:var(--amber); font-size:14px; letter-spacing:2px; }
-    .dep-text { font-size:15px; line-height:1.7; color:oklch(.80 .01 245); flex:1; font-style:italic; }
-    .dep-text::before { content:'\201C'; color:var(--cyan); font-size:24px; font-style:normal; display:block; margin-bottom:4px; line-height:1; font-family:Georgia,serif; }
-    .dep-author { display:flex; align-items:center; gap:14px; padding-top:18px; border-top:1px solid var(--border); }
-    .dep-avatar { width:44px; height:44px; border-radius:50%; background:var(--bg3); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-    .dep-name { font-size:14px; font-weight:700; letter-spacing:-.2px; margin-bottom:2px; }
-    .dep-role { font-size:12px; color:var(--muted); }
-    .dep-tag { margin-top:4px; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:4px; display:inline-block; }
-    .dep-tag.agro { background:oklch(.74 .16 155/.15); color:var(--green); }
-    .dep-tag.aero { background:oklch(.78 .17 200/.12); color:var(--cyan); }
-
-    /* ── CONTATO ─────────────────────────── */
-    #contato { background:var(--bg); }
-    .contato-grid { display:grid; grid-template-columns:1fr 1.2fr; gap:80px; margin-top:56px; align-items:start; }
-    .contato-info { display:flex; flex-direction:column; gap:28px; }
-    .ci-item { display:flex; align-items:flex-start; gap:16px; }
-    .ci-icon { width:40px; height:40px; border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px; }
-    .ci-label { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
-    .ci-val { font-size:15px; font-weight:500; }
-    .contato-form { display:flex; flex-direction:column; gap:14px; }
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    .form-field { display:flex; flex-direction:column; gap:6px; }
-    .form-field label { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
-    .form-field input, .form-field textarea, .form-field select {
-      background:var(--bg2); border:1px solid var(--border);
-      color:var(--text); border-radius:8px;
-      padding:12px 16px; font-family:var(--head); font-size:14px;
-      outline:none; transition:border-color .2s;
-    }
-    .form-field input:focus, .form-field textarea:focus, .form-field select:focus { border-color:var(--cyan); }
-    .form-field input::placeholder, .form-field textarea::placeholder { color:var(--muted); }
-    .form-field textarea { resize:vertical; min-height:120px; }
-    .btn-send { background:var(--cyan); color:var(--bg); border:none; padding:14px 36px; border-radius:8px; font-size:14px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; transition:all .2s; align-self:flex-start; }
-    .btn-send:hover { transform:translateY(-2px); box-shadow:0 10px 30px oklch(.78 .17 200/.3); }
-
-    /* ── DASHBOARD AERONÁUTICO ─────────────── */
-    #dash-aero { background: var(--bg2); }
-    .da-intro { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; margin-top:52px; }
-    .da-mockup-wrap { }
-    .da-label { font-family:var(--mono); font-size:11px; letter-spacing:.08em; color:var(--muted); text-transform:uppercase; margin-bottom:12px; }
-    .da-map-preview { background:#060c14; border:1px solid oklch(.26 .04 230); border-radius:12px; overflow:hidden; }
-    .da-map-bar { background:#04080f; border-bottom:1px solid oklch(.26 .04 230); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; }
-    .da-map-title { font-family:var(--mono); font-size:10px; color:var(--cyan); letter-spacing:.1em; display:flex; align-items:center; gap:8px; }
-    .da-live-dot { width:6px; height:6px; border-radius:50%; background:oklch(.74 .16 155); box-shadow:0 0 6px oklch(.74 .16 155); animation:pulse 2s infinite; }
-    @keyframes pulse { 0%,100% { box-shadow:0 0 0 0 oklch(.74 .16 155/.5); } 70% { box-shadow:0 0 0 8px oklch(.74 .16 155/0); } }
-    .da-chips { display:flex; gap:6px; }
-    .da-chip { font-family:var(--mono); font-size:9px; padding:3px 8px; border:1px solid oklch(.26 .04 230); color:oklch(.5 .01 245); border-radius:4px; }
-    .da-chip.on { border-color:oklch(.78 .17 200); color:oklch(.78 .17 200); background:oklch(.78 .17 200/.08); }
-    .da-overlay-bar { background:#04080f; border-bottom:1px solid oklch(.26 .04 230); padding:6px 16px; display:flex; gap:6px; align-items:center; }
-    .da-dots-area { padding:20px 16px; min-height:110px; position:relative; }
-    .da-dot { position:absolute; width:10px; height:10px; border-radius:50%; border:2px solid #060c14; }
-    .da-popup { background:#0a1520; border:1px solid oklch(.26 .04 230); border-radius:12px; padding:16px 18px; font-family:var(--mono); font-size:12px; }
-    .da-popup-icao { color:oklch(.74 .16 155); font-weight:700; font-size:16px; margin-bottom:2px; }
-    .da-popup-nome { color:oklch(.95 .008 245); font-size:12px; margin-bottom:8px; }
-    .da-popup-status { color:oklch(.74 .16 155); font-size:10px; letter-spacing:.1em; border-bottom:1px solid oklch(.26 .04 230); padding-bottom:8px; margin-bottom:10px; }
-    .da-popup-sec { color:oklch(.58 .012 245); font-size:9px; letter-spacing:.1em; margin-top:10px; margin-bottom:3px; border-top:1px solid oklch(.26 .04 230); padding-top:8px; }
-    .da-popup-pista { color:oklch(.95 .008 245); font-size:15px; font-weight:700; }
-    .da-popup-pista-det { color:oklch(.58 .012 245); font-size:10px; margin-top:2px; }
-    .da-popup-metar { color:oklch(.95 .008 245); font-size:10px; line-height:1.5; word-break:break-all; margin-top:4px; }
-    .da-popup-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
-    .da-popup-temp { color:var(--amber); font-size:13px; }
-    .da-popup-vento { color:var(--cyan); font-size:13px; }
-    .da-popup-qnh { color:oklch(.74 .16 155); font-size:13px; }
-    .da-popup-taf { color:oklch(.95 .008 245); font-size:10px; line-height:1.5; word-break:break-all; }
-    .da-popup-valid { color:oklch(.58 .012 245); font-size:9px; margin-top:3px; }
-    .da-feats { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); margin-top:56px; border-radius:12px; overflow:hidden; }
-    .da-feat { background:var(--bg2); padding:32px 28px; transition:background .2s; }
-    .da-feat:hover { background:var(--bg3); }
-    .da-feat-icon { font-size:1.8rem; margin-bottom:12px; display:block; }
-    .da-feat-badge { display:inline-block; font-family:var(--mono); font-size:9px; letter-spacing:.1em; padding:2px 8px; background:oklch(.78 .17 200/.08); border:1px solid oklch(.78 .17 200/.3); color:var(--cyan); border-radius:4px; margin-bottom:8px; }
-    .da-feat-title { font-size:15px; font-weight:600; color:var(--text); margin-bottom:6px; }
-    .da-feat-desc { font-size:13px; color:var(--muted); line-height:1.6; }
-    .da-cta { background:oklch(.78 .17 200/.06); border:1px solid oklch(.78 .17 200/.2); border-radius:16px; padding:36px 44px; display:flex; align-items:center; justify-content:space-between; gap:24px; margin-top:56px; flex-wrap:wrap; }
-    .da-cta h3 { font-size:20px; font-weight:700; color:var(--text); margin-bottom:6px; }
-    .da-cta p { font-size:14px; color:var(--muted); }
-    .da-cta-btns { display:flex; gap:12px; flex-wrap:wrap; }
-    @media(max-width:900px){
-      .da-intro { grid-template-columns:1fr; gap:32px; }
-      .da-feats { grid-template-columns:1fr 1fr; }
-      .da-cta { flex-direction:column; align-items:flex-start; }
-    }
-    @media(max-width:600px){ .da-feats { grid-template-columns:1fr; } }
-    /* ── FOOTER ──────────────────────────── */
-    footer { background:var(--bg2); padding:64px 60px 36px; border-top:1px solid var(--border); }
-    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:60px; margin-bottom:48px; }
-    .footer-brand p { font-size:13px; color:var(--muted); line-height:1.7; margin-top:16px; }
-    .footer-col h4 { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:18px; }
-    .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
-    .footer-col ul li a { font-size:13px; color:oklch(.65 .01 245); transition:color .2s; }
-    .footer-col ul li a:hover { color:var(--text); }
-    .footer-bottom { display:flex; align-items:center; justify-content:space-between; padding-top:28px; border-top:1px solid var(--border); }
-    .footer-bottom p { font-size:12px; color:var(--muted); }
-    .footer-mono { font-family:var(--mono); font-size:10px; color:oklch(.4 .01 245); }
-
-    /* ── TWEAKS ──────────────────────────── */
-    #tweaks-panel { display:none; position:fixed; bottom:24px; right:24px; z-index:8000; background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:20px; width:260px; box-shadow:0 20px 60px oklch(0 0 0/.5); }
-    #tweaks-panel h3 { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
-    .tw-row { margin-bottom:14px; }
-    .tw-row label { font-size:12px; color:var(--muted); display:block; margin-bottom:5px; }
-    .tw-row select { width:100%; background:var(--bg3); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:7px 10px; font-family:var(--head); font-size:13px; outline:none; }
-    .tw-row input[type=range] { width:100%; accent-color:var(--cyan); }
-
-    @media(max-width:900px){
-      nav{padding:0 20px}
-      .nav-links{display:none}
-      section{padding:64px 24px}
-      .hero{padding:90px 24px 60px}
-      .radar{display:none}
-      .hero-stats{flex-wrap:wrap}
-      .hstat{min-width:50%}
-      .prod-grid,.planos-grid,.dif-grid,.contato-grid,.footer-grid{grid-template-columns:1fr}
-      .proposta-inner{grid-template-columns:1fr}
-      .form-row{grid-template-columns:1fr}
-      .dif-cell{border-right:none!important}
-    }
-  </style>
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    #fx { display: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="nav">
-  <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 1v3M8 12v3M1 8h3M12 8h3M3.05 3.05l2.12 2.12M10.83 10.83l2.12 2.12M3.05 12.95l2.12-2.12M10.83 5.17l2.12-2.12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <span class="logo-text">VENTRA<span>SENSE</span></span>
+<nav>
+  <a href="#hero" class="nav-logo" aria-label="VentraSense — início">
+    <svg width="38" height="38" viewBox="0 0 44 44" aria-hidden="true">
+      <defs>
+        <linearGradient id="lgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#00d2ff"/><stop offset="1" stop-color="#00ff9d"/>
+        </linearGradient>
+        <linearGradient id="sweepg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#00d2ff" stop-opacity="0"/>
+          <stop offset="1" stop-color="#00d2ff" stop-opacity="0.55"/>
+        </linearGradient>
+      </defs>
+      <circle cx="22" cy="22" r="19" fill="none" stroke="url(#lgrad)" stroke-width="1.4" opacity="0.9"/>
+      <circle cx="22" cy="22" r="12.5" fill="none" stroke="#00d2ff" stroke-width="0.7" opacity="0.35"/>
+      <line x1="22" y1="2" x2="22" y2="7" stroke="#00d2ff" stroke-width="1" opacity="0.5"/>
+      <line x1="22" y1="37" x2="22" y2="42" stroke="#00d2ff" stroke-width="1" opacity="0.5"/>
+      <line x1="2" y1="22" x2="7" y2="22" stroke="#00d2ff" stroke-width="1" opacity="0.5"/>
+      <line x1="37" y1="22" x2="42" y2="22" stroke="#00d2ff" stroke-width="1" opacity="0.5"/>
+      <g>
+        <path d="M22 22 L22 4 A18 18 0 0 1 37.6 13 Z" fill="url(#sweepg)">
+          <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/>
+        </path>
+      </g>
+      <circle cx="29" cy="15" r="1.8" fill="#00ff9d">
+        <animate attributeName="opacity" values="1;0.15;1" dur="2.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="22" cy="22" r="2" fill="#00d2ff"/>
+    </svg>
+    <span class="nav-logo-text">VENTRA<b>SENSE</b></span>
+  </a>
+  <div class="nav-instruments" aria-hidden="true">
+    <span>UTC <span class="val" id="utcClock">--:--:--Z</span></span>
+    <span>ALT <span class="alt-val" id="altRead">00000FT</span></span>
   </div>
-  <div class="nav-links">
-    <a href="#produtos">Produtos</a>
-    <a href="#industrial">Industrial</a>
-    <a href="#dash-aero" style="color:var(--cyan)">Dashboard Aero</a>
-    <a href="#diferenciais">Diferenciais</a>
-    <a href="#planos">Planos</a>
-    <a href="#proposta">Proposta</a>
-    <a href="#contato">Contato</a>
-  </div>
-  <div class="nav-right">
-    <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema">☀️</button>
-    <a href="https://dashboard.ventrasense.com.br" class="btn-nav-fill">O Dashboard</a>
-    <a href="https://dashboard.ventrasense.com.br" class="btn-nav-ghost">Área do Cliente</a>
-  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#produtos">Produtos</a></li>
+    <li><a href="#telemetria">Demo</a></li>
+    <li><a href="#planos">Planos</a></li>
+    <li><a href="#loja">Proposta</a></li>
+    <li><a href="#contato">Contato</a></li>
+    <li><a href="https://dashboard.ventrasense.com.br" target="_blank" rel="noopener" class="nav-dash">⬡ Dashboard</a></li>
+    <li><a href="#" class="nav-cta" id="navLogin">Área do Cliente</a></li>
+  </ul>
+  <button class="nav-burger" id="burger" aria-label="Abrir menu">☰</button>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="radar">
-    <div class="rr"></div><div class="rr"></div><div class="rr"></div>
-    <div class="rr"></div><div class="rr"></div>
-    <div class="rsweep"></div>
-  </div>
-
-  <div class="hero-badge"><span class="badge-dot"></span>// Monitoramento Meteorológico Inteligente</div>
-  <h1>Dados <em>precisos</em><br>onde o clima<br><em>importa</em></h1>
-  <p class="hero-desc">Estações meteorológicas profissionais para o agronegócio e operações aeronáuticas. Monitoramento em tempo real, alertas automáticos e dashboard na palma da mão.</p>
-  <div class="hero-actions">
-    <a href="#produtos" class="btn-primary">Conheça as Estações</a>
-    <a href="#proposta" class="btn-outline">Solicitar Proposta</a>
+<header id="hero">
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="hero-gridlines" aria-hidden="true"></div>
+  <div class="hero-content">
+    <div class="hero-badge">// TELEMETRIA METEOROLÓGICA EM TEMPO REAL&nbsp;</div>
+    <h1 class="hero-title">Do <span class="t-agro">plantio</span><br/>ao <span class="t-aero">pouso</span>.</h1>
+    <p class="hero-sub">Estações meteorológicas profissionais que transmitem <strong>temperatura, vento, chuva e pressão a cada 10 segundos</strong> — com alertas automáticos, dashboard na nuvem e ATIS por voz para quem decide no campo e no ar.</p>
+    <div class="hero-btns">
+      <a href="demo.html" class="btn-primary">Ver demo ao vivo</a>
+      <a href="#produtos" class="btn-ghost">Conhecer as estações</a>
+    </div>
+    <div class="hero-dash-box">
+      <div class="pulse-dot"></div>
+      <div class="hero-dash-info">
+        <span class="hero-dash-label">// JÁ É CLIENTE?</span>
+        <span class="hero-dash-text">Acesse sua estação meteorológica em tempo real</span>
+      </div>
+      <a href="https://dashboard.ventrasense.com.br" target="_blank" rel="noopener" class="btn-dash">⬡ Acessar Dashboard</a>
+    </div>
   </div>
   <div class="hero-stats">
-    <div class="hstat"><div class="hn">24/7</div><div class="hl">Monitoramento</div></div>
-    <div class="hstat"><div class="hn">10s</div><div class="hl">Atualização</div></div>
-    <div class="hstat"><div class="hn">100%</div><div class="hl">Nuvem</div></div>
-    <div class="hstat"><div class="hn">∞</div><div class="hl">Estações</div></div>
+    <div class="hstat"><div class="hstat-n">10s</div><div class="hstat-l">Intervalo de telemetria</div></div>
+    <div class="hstat"><div class="hstat-n g">±0.1°C</div><div class="hstat-l">Precisão térmica</div></div>
+    <div class="hstat"><div class="hstat-n">24/7</div><div class="hstat-l">Servidor na nuvem</div></div>
+    <div class="hstat"><div class="hstat-n g">∞</div><div class="hstat-l">Estações por painel</div></div>
   </div>
+</header>
 
-  <!-- Floating sensor cards -->
-  <div class="hero-cards">
-    <div class="sc c">
-      <div class="slabel">Temperatura</div>
-      <div class="sval" id="hc-temp">23.4<span class="sunit">°C</span></div>
-      <div class="ssub"><span class="trend up">↑ 0.3°</span> última hora</div>
-      <svg class="spark" viewBox="0 0 176 32" fill="none">
-        <polyline points="0,26 22,22 44,24 66,16 88,20 110,12 132,16 154,8 176,12" stroke="var(--cyan)" stroke-width="1.5" fill="none" opacity=".8"/>
-        <polyline points="0,26 22,22 44,24 66,16 88,20 110,12 132,16 154,8 176,12 176,32 0,32" fill="var(--cyan)" opacity=".07"/>
-      </svg>
-    </div>
-    <div class="sc a">
-      <div class="slabel">Umidade Rel.</div>
-      <div class="sval" id="hc-hum">67<span class="sunit">%</span></div>
-      <div class="ssub"><span class="trend dn">↓ 2%</span> nas últimas 3h</div>
-      <svg class="spark" viewBox="0 0 176 32" fill="none">
-        <polyline points="0,8 22,12 44,10 66,16 88,12 110,20 132,14 154,22 176,18" stroke="var(--amber)" stroke-width="1.5" fill="none" opacity=".8"/>
-        <polyline points="0,8 22,12 44,10 66,16 88,12 110,20 132,14 154,22 176,18 176,32 0,32" fill="var(--amber)" opacity=".07"/>
-      </svg>
-    </div>
-    <div class="sc g">
-      <div class="slabel">Vento</div>
-      <div class="sval" id="hc-wind">14.2<span class="sunit">km/h</span></div>
-      <div class="ssub"><span class="trend up">↑ NE</span> 230° direção</div>
-      <svg class="spark" viewBox="0 0 176 32" fill="none">
-        <polyline points="0,18 22,14 44,22 66,6 88,18 110,10 132,14 154,4 176,14" stroke="var(--green)" stroke-width="1.5" fill="none" opacity=".8"/>
-        <polyline points="0,18 22,14 44,22 66,6 88,18 110,10 132,14 154,4 176,14 176,32 0,32" fill="var(--green)" opacity=".07"/>
-      </svg>
-    </div>
-  </div>
+<div class="ticker-strip" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
 
-  <div class="hero-ticker">
-    <div class="ticker-track">
-      <div class="ticker-item"><span class="td">◆</span> SP — <span id="sp-t">24.1</span>°C / 58% UR / Vento 12km/h NE</div>
-      <div class="ticker-item"><span class="td">◆</span> Curitiba — 18.7°C / 72% UR / Vento 8km/h SW</div>
-      <div class="ticker-item"><span class="td">◆</span> SDCO — METAR: VRB03KT 9999 FEW035 23/14 Q1013</div>
-      <div class="ticker-item"><span class="td">◆</span> Manaus — 31.2°C / 89% UR / Precipitação 2.4mm</div>
-      <div class="ticker-item"><span class="td">◆</span> SBRJ — METAR: 14005KT 8000 SCT020 28/22 Q1010</div>
-      <div class="ticker-item"><span class="td">◆</span> Recife — 28.4°C / 80% UR / Pressão 1012hPa</div>
-      <div class="ticker-item"><span class="td">◆</span> SBGR — ATIS: Info BRAVO / QNH 1013 / RWY 28L</div>
-      <div class="ticker-item"><span class="td">◆</span> POA — 21.0°C / 65% UR / Vento 15km/h W</div>
-      <!-- dup for loop -->
-      <div class="ticker-item"><span class="td">◆</span> SP — <span>24.1</span>°C / 58% UR / Vento 12km/h NE</div>
-      <div class="ticker-item"><span class="td">◆</span> Curitiba — 18.7°C / 72% UR / Vento 8km/h SW</div>
-      <div class="ticker-item"><span class="td">◆</span> SDCO — METAR: VRB03KT 9999 FEW035 23/14 Q1013</div>
-      <div class="ticker-item"><span class="td">◆</span> Manaus — 31.2°C / 89% UR / Precipitação 2.4mm</div>
-      <div class="ticker-item"><span class="td">◆</span> SBRJ — METAR: 14005KT 8000 SCT020 28/22 Q1010</div>
-      <div class="ticker-item"><span class="td">◆</span> Recife — 28.4°C / 80% UR / Pressão 1012hPa</div>
-      <div class="ticker-item"><span class="td">◆</span> SBGR — ATIS: Info BRAVO / QNH 1013 / RWY 28L</div>
-      <div class="ticker-item"><span class="td">◆</span> POA — 21.0°C / 65% UR / Vento 15km/h W</div>
+<section id="telemetria">
+  <div class="inner">
+    <div class="tele-head">
+      <div>
+        <div class="s-label">// AO VIVO</div>
+        <h2 class="s-title">O dashboard que seus<br/>dados merecem</h2>
+        <p class="s-desc">Esta é uma simulação interativa do painel VentraSense. Na operação real, cada valor abaixo chega da sua estação a cada 10 segundos.</p>
+      </div>
+      <div class="sim-chip">⦿ SIMULAÇÃO — DADOS ILUSTRATIVOS</div>
+    </div>
+    <div class="tele-grid reveal">
+      <div class="cluster hud">
+        <div class="gauge g-compass">
+          <svg class="compass-svg" viewBox="0 0 220 220" aria-label="Bússola de direção do vento">
+            <circle cx="110" cy="110" r="96" fill="none" stroke="#13283f" stroke-width="1.5"/>
+            <circle cx="110" cy="110" r="78" fill="none" stroke="#13283f" stroke-width="0.8" opacity="0.6"/>
+            <g id="ticks" stroke="#1d3c5e" stroke-width="1.5"></g>
+            <text x="110" y="32" text-anchor="middle" fill="#00d2ff" font-family="JetBrains Mono" font-size="13" font-weight="700">N</text>
+            <text x="194" y="115" text-anchor="middle" fill="#54748f" font-family="JetBrains Mono" font-size="11">E</text>
+            <text x="110" y="198" text-anchor="middle" fill="#54748f" font-family="JetBrains Mono" font-size="11">S</text>
+            <text x="26" y="115" text-anchor="middle" fill="#54748f" font-family="JetBrains Mono" font-size="11">W</text>
+            <g id="needle">
+              <polygon points="110,34 102,122 110,108 118,122" fill="#00d2ff"/>
+              <polygon points="110,108 102,122 110,186 118,122" fill="#0a4a66" opacity="0.85"/>
+            </g>
+            <circle cx="110" cy="110" r="5" fill="#04090f" stroke="#00d2ff" stroke-width="2"/>
+          </svg>
+          <div class="compass-digital">
+            <div class="kt"><span id="iKt">8</span><small> KT</small></div>
+            <div class="dir">VENTO <b id="iDir">090°</b> · <span id="iKmh">15</span> KM/H</div>
+          </div>
+        </div>
+        <div class="gauge g-temp">
+          <div class="gauge-label"><span>TEMPERATURA</span><span class="trend up" id="iTempTrend">▲</span></div>
+          <div class="gauge-val"><span id="iTemp">24.3</span><small>°C</small></div>
+          <div class="gauge-sub">PONTO DE ORVALHO <b id="iDew">16.7°C</b></div>
+        </div>
+        <div class="gauge g-hum">
+          <div class="gauge-label"><span>UMIDADE RELATIVA</span></div>
+          <div class="gauge-val"><span id="iHum">62</span><small>%</small></div>
+          <div class="bar-track"><div class="bar-fill g" id="iHumBar" style="width:62%"></div></div>
+        </div>
+        <div class="gauge g-qnh">
+          <div class="gauge-label"><span>PRESSÃO QNH</span></div>
+          <div class="gauge-val"><span id="iQnh">1018</span><small>hPa</small></div>
+          <svg class="spark" viewBox="0 0 120 34" preserveAspectRatio="none" aria-hidden="true">
+            <polygon class="area" id="sparkArea" points=""></polygon>
+            <polyline id="sparkLine" points=""></polyline>
+          </svg>
+        </div>
+        <div class="gauge g-rain">
+          <div class="gauge-label"><span>PRECIPITAÇÃO 24H</span></div>
+          <div class="gauge-val"><span id="iRain">0.0</span><small>mm</small></div>
+          <div class="bar-track"><div class="bar-fill" id="iRainBar" style="width:0%"></div></div>
+        </div>
+        <div class="gauge g-status">
+          <div class="mod-list">
+            <div class="mod"><i></i>SHT35</div>
+            <div class="mod"><i></i>RTC</div>
+            <div class="mod"><i></i>SD</div>
+            <div class="mod"><i></i>WIFI</div>
+            <div class="mod rx-led" id="rxLed"><i></i>LINK</div>
+          </div>
+          <div class="rx-info">PACOTE <b id="pktNum">#08412</b> · RX <b id="rxTime">--:--:--Z</b> · PRÓX EM <b id="rxNext">10S</b></div>
+        </div>
+      </div>
+
+      <div class="atis hud" id="atisBox">
+        <div class="atis-head">
+          <span>// ATIS — INFORMAÇÃO POR VOZ</span>
+          <span class="onair"><i></i>ON AIR</span>
+        </div>
+        <div class="atis-body">
+          <pre class="atis-text" id="atisText">AGUARDANDO TRANSMISSÃO...
+
+PRESSIONE ▶ PARA OUVIR O
+BOLETIM ATIS GERADO COM OS
+DADOS DESTA SIMULAÇÃO.
+
+A ESTAÇÃO AERO LÊ AS
+CONDIÇÕES EM PORTUGUÊS,
+AUTOMATICAMENTE, 24/7.<span class="caret">█</span></pre>
+        </div>
+        <div class="atis-bars" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="atis-foot">
+          <div class="atis-btns">
+            <button class="btn-atis" id="atisPlay">▶ Transmitir ATIS</button>
+            <button class="btn-atis stop" id="atisStop" disabled>■</button>
+          </div>
+          <p class="atis-note">Demonstração com síntese de voz do navegador. Na estação VentraSense Aero, o boletim é gerado com dados reais da sua pista.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- PRODUTOS -->
 <section id="produtos">
-  <div class="prod-header rv">
-    <div class="stag">// Soluções</div>
-    <h2 class="sh">Duas estações.<br>Um único padrão de excelência.</h2>
-    <p class="sd">Desenvolvidas para os desafios reais do campo e do ar, com hardware robusto e software profissional.</p>
-  </div>
-  <div class="prod-grid">
-
-    <div class="prod-card agro rv rv2">
-      <div class="prod-top">
-        <div class="prod-icon">🌱</div>
-        <div class="prod-cat agro">Agrometeorologia</div>
-        <div class="prod-name">VentraSense Agro</div>
+  <div class="inner">
+    <div class="s-label">// SOLUÇÕES</div>
+    <h2 class="s-title">Duas estações.<br/>Um único padrão de excelência.</h2>
+    <p class="s-desc">Desenvolvidas para os desafios reais do campo e do ar, com hardware robusto, energia solar e software profissional.</p>
+    <div class="prod-grid reveal">
+      <article class="prod agro hud">
+        <div class="prod-icon" aria-hidden="true">
+          <svg viewBox="0 0 52 52" fill="none" stroke="#00ff9d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M26 44 V20"/>
+            <path d="M26 28 C26 18 18 12 8 12 C8 22 16 28 26 28 Z"/>
+            <path d="M26 22 C26 14 32 9 42 9 C42 17 36 22 26 22 Z"/>
+            <path d="M14 44 H38"/>
+          </svg>
+        </div>
+        <span class="prod-tag">AGROMETEOROLOGIA</span>
+        <h3 class="prod-title">VentraSense Agro</h3>
         <p class="prod-desc">Monitoramento completo para propriedades rurais, cooperativas e culturas de precisão. Tome decisões de irrigação, colheita e manejo baseadas em dados reais da sua propriedade.</p>
-      </div>
-      <div class="prod-features">
-        <ul>
+        <ul class="prod-feats">
           <li>Temperatura e umidade do ar (±0.1°C)</li>
           <li>Velocidade e direção do vento</li>
           <li>Precipitação acumulada e por período</li>
@@ -658,779 +799,752 @@
           <li>Alertas por e-mail automáticos</li>
           <li>Instalação inclusa no valor da estação</li>
         </ul>
-      </div>
-      <div class="prod-footer">
-        <div class="prod-price">
-          <div class="pv">R$ 7.000</div>
-          <div class="ps">pagamento único</div>
-          <div class="pm">+ R$ 149/mês dashboard</div>
+        <div class="prod-price"><strong>R$ 7.000</strong> + R$ 149/mês</div>
+        <div class="prod-note">* Condição especial de entrada para primeiros clientes</div>
+        <div class="prod-bg">A</div>
+      </article>
+      <article class="prod aero hud">
+        <div class="prod-icon" aria-hidden="true">
+          <svg viewBox="0 0 52 52" fill="none" stroke="#00d2ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 34 L46 22 C48 21.4 49 19.8 48.4 18.2 C47.8 16.6 46 15.8 44.4 16.4 L32 21 L14 10 L9 12 L20 25 L10 29 L5 26 L2 27.5 L6 34 Z"/>
+            <path d="M14 40 H44" opacity="0.5"/>
+            <path d="M20 45 H38" opacity="0.3"/>
+          </svg>
         </div>
-        <a href="#proposta" class="btn-outline" style="font-size:13px;padding:10px 20px;">Adicionar →</a>
-      </div>
-    </div>
-
-    <div class="prod-card aero rv rv3">
-      <div class="prod-top">
-        <div class="prod-icon">✈️</div>
-        <div class="prod-cat aero">Operações Aeronáuticas</div>
-        <div class="prod-name">VentraSense Aero</div>
-        <p class="prod-desc">Dados meteorológicos profissionais para aeródromos, helipads e pistas privadas. Sistema ATIS automático integrado, consulta de NOTAMs, METARs e suporte completo a operações de voo para pilotos e agentes de solo.</p>
-      </div>
-      <div class="prod-features">
-        <ul>
+        <span class="prod-tag">OPERAÇÕES AERONÁUTICAS</span>
+        <h3 class="prod-title">VentraSense Aero</h3>
+        <p class="prod-desc">Dados meteorológicos profissionais para aeródromos, helipads e pistas privadas. Com sistema ATIS automático integrado para apoio às operações de voo.</p>
+        <ul class="prod-feats">
           <li>Todos os sensores da versão Agro</li>
           <li>Leitura de vento em nós e km/h</li>
           <li>Sistema ATIS por voz automático (pt-BR)</li>
           <li>Dados atualizados a cada 10 segundos</li>
-          <li>Consulta de NOTAMs e METARs integrada</li>
+          <li>Indicador de status em tempo real</li>
           <li>Alertas de condições adversas ao voo</li>
           <li>Dashboard com interface aeronáutica</li>
           <li>Instalação inclusa no valor da estação</li>
         </ul>
-      </div>
-      <div class="prod-footer">
-        <div class="prod-price">
-          <div class="pv">R$ 9.000</div>
-          <div class="ps">pagamento único</div>
-          <div class="pm">+ R$ 349/mês dashboard + ATIS</div>
-        </div>
-        <a href="#proposta" class="btn-primary" style="font-size:13px;padding:11px 20px;">Adicionar →</a>
-      </div>
+        <div class="prod-price"><strong>R$ 9.000</strong> + R$ 349/mês</div>
+        <div class="prod-note">* Condição especial de entrada para primeiros clientes</div>
+        <div class="prod-bg">B</div>
+      </article>
     </div>
-
   </div>
 </section>
 
-<!-- INDUSTRIAL -->
-<section id="industrial">
-  <div class="rv">
-    <div class="stag">// VentraSense Industrial</div>
-    <h2 class="sh">Monitoramento interno<br><em style="font-style:normal;color:var(--amber)">sob medida</em></h2>
-    <p class="sd">Quando o ambiente interno precisa ser controlado com precisão — fábricas, aviários, câmaras frias, estufas. Sensores configurados para a sua operação, com alertas que protegem o que importa.</p>
-  </div>
-
-  <!-- Casos de uso -->
-  <div class="ind-cases rv" style="margin-top:48px;">
-    <div class="ind-case-grid">
-      <div class="ind-case">
-        <div class="ind-case-icon" style="background:oklch(.78 .16 65/.12)">🐔</div>
-        <div class="ind-case-name">Aviários</div>
-        <div class="ind-case-desc">Alerta imediato se a temperatura ultrapassar o limite crítico. Proteja seu plantel antes que seja tarde.</div>
+<section id="fluxo">
+  <div class="inner">
+    <div class="s-label">// COMO FUNCIONA</div>
+    <h2 class="s-title">Da estação à decisão<br/>em 10 segundos</h2>
+    <p class="s-desc">Um fluxo contínuo e redundante: mesmo sem internet, a estação grava tudo localmente e retoma o envio sozinha.</p>
+    <div class="pipeline reveal">
+      <div class="pnode">
+        <div class="pnode-num">01 // CAPTURA</div>
+        <div class="pnode-icon"><svg viewBox="0 0 34 34"><path d="M17 4 V18"/><circle cx="17" cy="24" r="5"/><path d="M13 8 H21 M13 12 H21"/></svg></div>
+        <div class="pnode-title">Sensores de precisão</div>
+        <p class="pnode-desc">Temperatura, umidade, vento, chuva e pressão coletados a cada 5 segundos, com relógio RTC de alta precisão.</p>
       </div>
-      <div class="ind-case">
-        <div class="ind-case-icon" style="background:oklch(.78 .17 200/.10)">🏭</div>
-        <div class="ind-case-name">Fábricas</div>
-        <div class="ind-case-desc">Mapeamento térmico de pontos críticos em linhas de produção, fornos, câmaras e equipamentos.</div>
+      <div class="pipe" aria-hidden="true"><i class="pkt"></i></div>
+      <div class="pnode">
+        <div class="pnode-num">02 // ENLACE</div>
+        <div class="pnode-icon"><svg viewBox="0 0 34 34"><path d="M17 28 V18"/><circle cx="17" cy="29" r="2.5"/><path d="M9 14 C13 9 21 9 25 14"/><path d="M5 9 C12 1 22 1 29 9"/><path d="M13 18 C15 16 19 16 21 18"/></svg></div>
+        <div class="pnode-title">Transmissão resiliente</div>
+        <p class="pnode-desc">Pacote JSON enviado à nuvem a cada 10s. Caiu o WiFi? Reconexão automática e backup contínuo no cartão SD.</p>
       </div>
-      <div class="ind-case">
-        <div class="ind-case-icon" style="background:oklch(.74 .16 155/.12)">❄️</div>
-        <div class="ind-case-name">Câmaras Frias</div>
-        <div class="ind-case-desc">Monitoramento contínuo 24/7 com alerta de desvio de temperatura. Zero perda de produto.</div>
+      <div class="pipe" aria-hidden="true"><i class="pkt"></i></div>
+      <div class="pnode">
+        <div class="pnode-num">03 // NUVEM</div>
+        <div class="pnode-icon"><svg viewBox="0 0 34 34"><path d="M9 24 C5 24 3 21 3 18 C3 15 5 12.5 8 12.2 C9 7.5 13 5 17 5 C22 5 26 8.5 26.6 13 C29.5 13.4 31 16 31 18.6 C31 21.5 28.8 24 25.5 24 Z"/></svg></div>
+        <div class="pnode-title">Servidor 24/7</div>
+        <p class="pnode-desc">Infraestrutura dedicada na nuvem com sessões criptografadas, histórico de 30 dias e acesso por estação.</p>
       </div>
-      <div class="ind-case">
-        <div class="ind-case-icon" style="background:oklch(.78 .16 65/.10)">🌿</div>
-        <div class="ind-case-name">Estufas Agrícolas</div>
-        <div class="ind-case-desc">Controle de temperatura e umidade por zona. Cultivo de precisão com dados em tempo real.</div>
-      </div>
-      <div class="ind-case">
-        <div class="ind-case-icon" style="background:oklch(.78 .17 200/.10)">💊</div>
-        <div class="ind-case-name">Farmacêutico</div>
-        <div class="ind-case-desc">Rastreabilidade de temperatura para conformidade regulatória. Relatórios automáticos para auditorias.</div>
-      </div>
-      <div class="ind-case">
-        <div class="ind-case-icon" style="background:oklch(.74 .16 155/.10)">🖥️</div>
-        <div class="ind-case-name">Data Centers</div>
-        <div class="ind-case-desc">Mapeamento térmico de racks e salas. Alertas antes do superaquecimento causar downtime.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Como funciona -->
-  <div class="ind-how rv" style="margin-top:56px;">
-    <div class="ind-how-grid">
-      <div class="ind-how-card">
-        <div class="ihc-num">01</div>
-        <div class="ihc-title">Diagnóstico</div>
-        <div class="ihc-desc">Nossa equipe entende sua operação, mapeia os pontos críticos e define os limites de alerta.</div>
-      </div>
-      <div class="ind-how-card">
-        <div class="ihc-num">02</div>
-        <div class="ihc-title">Instalação</div>
-        <div class="ihc-desc">Sensores instalados e configurados no local. Hardware industrial, IP65+, resistente ao ambiente.</div>
-      </div>
-      <div class="ind-how-card">
-        <div class="ihc-num">03</div>
-        <div class="ihc-title">Dashboard + Alertas</div>
-        <div class="ihc-desc">Visualização em tempo real de todos os pontos. Alertas por e-mail e WhatsApp quando limites são atingidos.</div>
-      </div>
-      <div class="ind-how-card">
-        <div class="ihc-num">04</div>
-        <div class="ihc-title">Histórico & Relatórios</div>
-        <div class="ihc-desc">Exportação de dados para laudos, auditorias e análise de tendências. Retenção ilimitada.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CTA Industrial -->
-  <div class="ind-cta rv" style="margin-top:48px;">
-    <div class="ind-cta-inner">
-      <div>
-        <div class="ind-cta-title">Projeto personalizado para a sua operação</div>
-        <div class="ind-cta-desc">Cada instalação é única. Fale com nossa equipe e receba uma proposta sob medida em até 24h.</div>
-      </div>
-      <div class="ind-cta-actions">
-        <a href="#contato" class="btn-primary" style="background:var(--amber);color:oklch(.12 .02 245)">Solicitar Diagnóstico</a>
-        <span class="ind-price">A partir de <strong>R$ 3.500</strong> + mensalidade</span>
+      <div class="pipe" aria-hidden="true"><i class="pkt"></i></div>
+      <div class="pnode">
+        <div class="pnode-num">04 // DECISÃO</div>
+        <div class="pnode-icon"><svg viewBox="0 0 34 34"><rect x="3" y="6" width="28" height="18" rx="1.5"/><path d="M12 29 H22 M17 24 V29"/><path d="M8 18 L13 13 L17 16 L26 10"/></svg></div>
+        <div class="pnode-title">Dashboard + alertas</div>
+        <p class="pnode-desc">Visualize de qualquer dispositivo, receba alertas de geada e vento por e-mail e ouça o ATIS na pista.</p>
       </div>
     </div>
   </div>
 </section>
 
-
-<!-- DASHBOARD AERONÁUTICO -->
-<section id="dash-aero">
-  <div class="rv">
-    <div class="stag">// Para Pilotos e Aeródromos</div>
-    <h2 class="sh">Dashboard <em style="font-style:normal;color:var(--cyan)">Aeronáutico</em><br>integrado ao mapa</h2>
-    <p class="sd">Mais do que dados da sua estação — o dashboard exibe um mapa interativo com <strong style="color:var(--text)">mais de 500 aeródromos brasileiros</strong>: comerciais, privados e militares, com METAR ao vivo, TAF e dados de pista certificados.</p>
-  </div>
-
-  <div class="da-intro rv">
-    <!-- Mockup do mapa -->
-    <div class="da-mockup-wrap">
-      <div class="da-label">// Mapa ao vivo no dashboard</div>
-      <div class="da-map-preview">
-        <div class="da-map-bar">
-          <div class="da-map-title">
-            <div class="da-live-dot"></div>
-            MAPA METEOROLÓGICO
-          </div>
-          <div class="da-chips">
-            <div class="da-chip">CHUVA</div>
-            <div class="da-chip">NUVENS</div>
-          </div>
-        </div>
-        <div class="da-overlay-bar">
-          <span style="font-family:var(--mono);font-size:9px;color:oklch(.5 .01 245);letter-spacing:.1em;">OVERLAY:</span>
-          <div class="da-chip">⛈ STSC</div>
-          <div class="da-chip on">◉ AERÓD.</div>
-          <div class="da-chip">✈ AMDAR</div>
-        </div>
-        <div class="da-dots-area">
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:18px;left:55px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:45px;left:130px;"></div>
-          <div class="da-dot" style="background:oklch(.78 .16 65);box-shadow:0 0 8px oklch(.78 .16 65);top:70px;left:28px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:82px;left:95px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:25px;left:195px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:60px;left:215px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:88px;left:170px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:10px;left:240px;"></div>
-          <div class="da-dot" style="background:oklch(.78 .16 65);box-shadow:0 0 8px oklch(.78 .16 65);top:40px;left:75px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:95px;left:145px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:55px;left:250px;"></div>
-          <div class="da-dot" style="background:oklch(.74 .16 155);box-shadow:0 0 8px oklch(.74 .16 155);top:75px;left:185px;"></div>
-          <span style="position:absolute;bottom:4px;right:6px;font-family:var(--mono);font-size:8px;color:oklch(.5 .01 245);letter-spacing:.05em;">+500 aeródromos · comerciais · privados · militares</span>
-        </div>
-      </div>
-      <p style="font-size:12px;color:var(--muted);margin-top:10px;font-family:var(--mono);letter-spacing:.05em;">▸ Clique em qualquer aeródromo para ver os dados completos</p>
-    </div>
-
-    <!-- Mockup do popup -->
-    <div>
-      <div class="da-label">// Popup ao clicar no aeródromo</div>
-      <div class="da-popup">
-        <div class="da-popup-icao">◉ SBCT</div>
-        <div class="da-popup-nome">Afonso Pena</div>
-        <div class="da-popup-status">STATUS: VERDE</div>
-        <div class="da-popup-sec">PISTA PRINCIPAL</div>
-        <div class="da-popup-pista">2.218 m <span style="color:var(--muted);font-size:11px">(7.277 ft)</span></div>
-        <div class="da-popup-pista-det">45m larg. &nbsp;·&nbsp; 2 pistas &nbsp;·&nbsp; ASP</div>
-        <div class="da-popup-sec">METAR</div>
-        <div class="da-popup-metar">SBCT 130900Z 14008KT 9999 FEW030 21/14 Q1018 NOSIG</div>
-        <div class="da-popup-row">
-          <span class="da-popup-temp">21°C</span>
-          <span class="da-popup-vento">140°/8kt</span>
-          <span class="da-popup-qnh">QNH 1018hPa</span>
-        </div>
-        <div class="da-popup-sec">TAF</div>
-        <div class="da-popup-taf">TAF SBCT 1312/1418 14008KT 9999 FEW025 TEMPO 1314/1318 TS SCT015CB</div>
-        <div class="da-popup-valid">Válido: 13/05 12:00 → 14/05 18:00</div>
-      </div>
-      <p style="font-size:12px;color:var(--muted);margin-top:10px;font-family:var(--mono);letter-spacing:.05em;">▸ REDEMET + aviationweather.gov · carregado ao clicar</p>
-    </div>
-  </div>
-
-  <div class="da-feats rv">
-    <div class="da-feat">
-      <span class="da-feat-icon">🗺️</span>
-      <div class="da-feat-badge">+500 AERÓDROMOS</div>
-      <div class="da-feat-title">Cobertura completa do Brasil</div>
-      <p class="da-feat-desc">Aeródromos comerciais, privados (fazendas, aeroclubes) e militares no mapa, com marcadores coloridos indicando status operacional via REDEMET.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">🏠</span>
-      <div class="da-feat-badge">PRIVADOS · MILITARES</div>
-      <div class="da-feat-title">Aeródromos privados e militares</div>
-      <p class="da-feat-desc">Além dos aeroportos comerciais, exibimos pistas privadas (prefixos SD, SI, SJ, SN, SS, SW) e bases militares da FAB — cobertura que poucos sistemas oferecem.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">📋</span>
-      <div class="da-feat-badge">METAR AO VIVO</div>
-      <div class="da-feat-title">METAR integrado ao popup</div>
-      <p class="da-feat-desc">Ao clicar num aeródromo, o METAR atual é carregado: código bruto, temperatura, vento e QNH destacados. Fonte: REDEMET ou aviationweather.gov.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">🔮</span>
-      <div class="da-feat-badge">REDEMET · DECEA</div>
-      <div class="da-feat-title">TAF simplificado</div>
-      <p class="da-feat-desc">Previsão de aeródromo (TAF) exibida no popup com validade. Integração direta com a API oficial do DECEA/REDEMET.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">🛬</span>
-      <div class="da-feat-badge">OURAIRPORTS · CERTIFICADO</div>
-      <div class="da-feat-title">Dados de pista verificados</div>
-      <p class="da-feat-desc">Comprimento, largura e superfície da pista principal. Dados do OurAirports — mesma base usada por ForeFlight, SkyVector e X-Plane.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">⛈</span>
-      <div class="da-feat-badge">STSC · REDEMET</div>
-      <div class="da-feat-title">Células convectivas no mapa</div>
-      <p class="da-feat-desc">Overlay STSC exibe células convectivas ativas sobre o Brasil com posição e intensidade em tempo real.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">✈</span>
-      <div class="da-feat-badge">AMDAR · REDEMET</div>
-      <div class="da-feat-title">Aeronaves AMDAR em voo</div>
-      <p class="da-feat-desc">Visualize aeronaves enviando dados meteorológicos em voo: altitude, temperatura, vento e fase (subida/cruzeiro/descida).</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">📡</span>
-      <div class="da-feat-badge">SIGMET · GAMET</div>
-      <div class="da-feat-title">SIGMET e GAMET ativos</div>
-      <p class="da-feat-desc">Painel lateral com todos os SIGMET e GAMET ativos no Brasil. Condições perigosas ao voo sempre visíveis.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">🎙️</span>
-      <div class="da-feat-badge">ATIS INTEGRADO</div>
-      <div class="da-feat-title">ATIS por voz automático</div>
-      <p class="da-feat-desc">Toque um botão e ouça o ATIS da sua estação em português: vento, visibilidade, temperatura, QNH e precipitação no padrão ICAO.</p>
-    </div>
-    <div class="da-feat">
-      <span class="da-feat-icon">🌐</span>
-      <div class="da-feat-badge">SIGWX · DECEA</div>
-      <div class="da-feat-title">Carta SIGWX atualizada</div>
-      <p class="da-feat-desc">Carta de Tempo Significativo (SIGWX) integrada. Clique para ampliar e planejar rotas com visão das condições em altitude.</p>
-    </div>
-  </div>
-
-  <div class="da-cta rv">
-    <div>
-      <h3>Tudo disponível no dashboard da sua estação</h3>
-      <p>Já é cliente? Acesse agora. Ainda não tem uma estação? Solicite sua proposta.</p>
-    </div>
-    <div class="da-cta-btns">
-      <a href="https://dashboard.ventrasense.com.br" target="_blank" class="btn-primary">Acessar Dashboard</a>
-      <a href="#proposta" class="btn-outline">Solicitar Proposta</a>
-    </div>
-  </div>
-</section>
-
-<!-- VIDEO -->
-<section id="video" style="padding-top:0">
-  <div class="rv">
-    <div class="stag">// Em Ação</div>
-    <h2 class="sh">Veja a VentraSense<br>funcionando</h2>
-  </div>
-  <div class="video-wrap rv">
-    <div class="play-btn">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M6 4l12 6-12 6V4z" fill="var(--cyan)"/>
-      </svg>
-    </div>
-    <span class="video-label">Vídeo em breve</span>
-  </div>
-</section>
-
-<!-- DIFERENCIAIS -->
 <section id="diferenciais">
-  <div class="dif-header rv">
-    <div class="stag">// Por que VentraSense</div>
-    <h2 class="sh">Tecnologia que<br>trabalha por você</h2>
-  </div>
-  <div class="dif-grid rv">
-    <div class="dif-cell">
-      <span class="dif-icon">⚡</span>
-      <div class="dif-title">Atualização a cada 10s</div>
-      <p class="dif-desc">Dados enviados continuamente para a nuvem. Você vê o que está acontecendo agora, sem atraso.</p>
-    </div>
-    <div class="dif-cell">
-      <span class="dif-icon">🔔</span>
-      <div class="dif-title">Alertas Inteligentes</div>
-      <p class="dif-desc">Geada, vento forte, chuva intensa, nevoeiro. Receba alertas por e-mail antes que o problema chegue.</p>
-    </div>
-    <div class="dif-cell">
-      <span class="dif-icon">☁️</span>
-      <div class="dif-title">100% na Nuvem</div>
-      <p class="dif-desc">Servidor dedicado online 24h por dia. Acesse o dashboard de qualquer celular, tablet ou computador.</p>
-    </div>
-    <div class="dif-cell">
-      <span class="dif-icon">🔧</span>
-      <div class="dif-title">Instalação Simplificada</div>
-      <p class="dif-desc">Nossa equipe orienta o processo e valida os detalhes da instalação conforme a realidade de cada operação.</p>
-    </div>
-    <div class="dif-cell">
-      <span class="dif-icon">🎙️</span>
-      <div class="dif-title">ATIS por Voz</div>
-      <p class="dif-desc">Para aeródromos: as informações meteorológicas lidas automaticamente em português. Toque um botão e ouça.</p>
-    </div>
-    <div class="dif-cell">
-      <span class="dif-icon">🛡️</span>
-      <div class="dif-title">Hardware Robusto</div>
-      <p class="dif-desc">Sensores calibrados, protegidos e testados para o ambiente externo. Alimentação estabilizada contra surtos.</p>
+  <div class="inner">
+    <div class="s-label">// POR QUE VENTRASENSE</div>
+    <h2 class="s-title">Tecnologia que<br/>trabalha por você</h2>
+    <div class="dif-grid reveal">
+      <div class="dif"><div class="dif-num">01</div><div class="dif-title">Atualização a cada 10s</div><p class="dif-desc">Dados enviados continuamente para a nuvem. Você vê o que está acontecendo agora — sem atraso, sem média de hora em hora.</p></div>
+      <div class="dif"><div class="dif-num">02</div><div class="dif-title">Alertas inteligentes</div><p class="dif-desc">Geada, vento forte, chuva intensa, nevoeiro. Receba alertas por e-mail antes que o problema chegue à lavoura ou à pista.</p></div>
+      <div class="dif"><div class="dif-num">03</div><div class="dif-title">100% na nuvem</div><p class="dif-desc">Servidor dedicado online 24h por dia. Acesse o dashboard de qualquer celular, tablet ou computador, onde estiver.</p></div>
+      <div class="dif"><div class="dif-num">04</div><div class="dif-title">Energia solar autônoma</div><p class="dif-desc">Painel solar com controlador de carga dimensionado com folga. A estação opera independente da rede elétrica.</p></div>
+      <div class="dif"><div class="dif-num">05</div><div class="dif-title">ATIS por voz</div><p class="dif-desc">Para aeródromos: informações meteorológicas lidas automaticamente em português, com fraseologia aeronáutica. Toque e ouça.</p></div>
+      <div class="dif"><div class="dif-num">06</div><div class="dif-title">Redundância total</div><p class="dif-desc">Backup local em cartão SD, reconexão automática de WiFi e sensores com auto-recuperação. Os dados não se perdem.</p></div>
     </div>
   </div>
 </section>
 
-<!-- PLANOS -->
 <section id="planos">
-  <div class="planos-header rv">
-    <div class="stag">// Planos</div>
-    <h2 class="sh">Escolha seu plano</h2>
-    <p class="sd">Hardware com instalação inclusa + acesso ao dashboard. Tudo organizado para uma operação simples e profissional.</p>
-  </div>
-  <div class="planos-grid">
-
-    <div class="plan-card rv rv2">
-      <div class="plan-name">VentraSense Agro</div>
-      <div class="plan-price cyan">R$ 149</div>
-      <div class="plan-period">/mês · recorrente</div>
-      <div class="plan-hw">Hardware + instalação: <span>R$ 7.000</span></div>
-      <ul class="plan-features">
-        <li class="yes">Dashboard web completo</li>
-        <li class="yes">Alertas automáticos</li>
-        <li class="yes">Histórico de dados</li>
-        <li class="yes">Monitoramento 24/7</li>
-        <li class="yes">Testação incluída</li>
-        <li class="no">ATIS por voz</li>
-      </ul>
-      <button class="btn-plan ghost" onclick="location.href='#proposta'">Escolher Agro</button>
-    </div>
-
-    <div class="plan-card featured rv rv3">
-      <div class="plan-badge">AERO</div>
-      <div class="plan-name">VentraSense Aero</div>
-      <div class="plan-price cyan">R$ 349</div>
-      <div class="plan-period">/mês · recorrente</div>
-      <div class="plan-hw">Hardware + instalação: <span>R$ 9.000</span></div>
-      <ul class="plan-features">
-        <li class="yes">Dashboard web completo</li>
-        <li class="yes">Alertas operacionais</li>
-        <li class="yes">Histórico de dados</li>
-        <li class="yes">Monitoramento 24/7</li>
-        <li class="yes">ATIS por voz</li>
-        <li class="yes">Suporte prioritário</li>
-      </ul>
-      <button class="btn-plan fill" onclick="location.href='#proposta'">Escolher Aero</button>
-    </div>
-
-    <div class="plan-card rv rv4">
-      <div class="plan-name">Enterprise</div>
-      <div class="plan-price" style="font-size:32px;letter-spacing:-1px;">Sob consulta</div>
-      <div class="plan-period">Múltiplas estações / projetos personalizados</div>
-      <div class="plan-hw" style="margin-top:16px;">Módulos avançados e projetos personalizados</div>
-      <ul class="plan-features">
-        <li class="yes">Estações ilimitadas</li>
-        <li class="yes">Dashboard unificado</li>
-        <li class="yes">Alertas avançados</li>
-        <li class="yes">Histórico estendido</li>
-        <li class="yes">ATIS por voz</li>
-        <li class="yes">Gerente de conta</li>
-      </ul>
-      <button class="btn-plan ghost" onclick="location.href='#contato'">Falar com Vendas</button>
-    </div>
-
-  </div>
-</section>
-
-<!-- PROPOSTA -->
-<section id="proposta">
-  <div class="rv">
-    <div class="stag">// Proposta</div>
-    <h2 class="sh">Solicite sua proposta</h2>
-    <p class="sd">Selecione a estação e o plano desejado. Nossa equipe entrará em contato para confirmar os detalhes da instalação conforme sua localidade.</p>
-  </div>
-  <div class="proposta-inner rv">
-    <div class="prop-items">
-      <div class="prop-item">
-        <div class="prop-item-icon">🌱</div>
-        <div class="prop-item-info">
-          <div class="pi-name">VentraSense Agro — Estação + Instalação</div>
-          <div class="pi-desc">Estação completa com sensores, montagem, configuração e instalação inclusa</div>
-        </div>
-        <div class="prop-item-price">R$ 7.000<small>pagamento único</small></div>
-        <button class="btn-add" data-id="agro-hw" data-name="Estação Agro" data-price="7000" data-type="unico" onclick="toggleItem(this)">+ Adicionar</button>
+  <div class="inner">
+    <div class="s-label">// PLANOS</div>
+    <h2 class="s-title">Escolha seu plano</h2>
+    <p class="s-desc">Hardware com instalação inclusa + acesso ao dashboard. Tudo organizado para uma operação simples e profissional.</p>
+    <div class="planos-grid reveal">
+      <div class="plano destaque">
+        <div class="plano-tag">AGRO</div>
+        <div class="plano-nome">VentraSense Agro</div>
+        <div class="plano-preco">R$ 149<span>/mês</span></div>
+        <div class="plano-hw">HARDWARE + INSTALAÇÃO: R$ 7.000</div>
+        <ul class="plano-feats">
+          <li><span class="y">✓</span> Dashboard web completo</li>
+          <li><span class="y">✓</span> Alertas automáticos</li>
+          <li><span class="y">✓</span> Histórico de dados</li>
+          <li><span class="y">✓</span> Monitoramento 24/7</li>
+          <li><span class="y">✓</span> 1 estação incluída</li>
+          <li><span class="n">—</span> ATIS por voz</li>
+        </ul>
+        <a href="#loja" class="btn-plano">Escolher Agro</a>
       </div>
-      <div class="prop-item">
-        <div class="prop-item-icon">✈️</div>
-        <div class="prop-item-info">
-          <div class="pi-name">VentraSense Aero — Estação + Instalação</div>
-          <div class="pi-desc">Estação completa para aeródromo com sensores, ATIS e instalação inclusa</div>
-        </div>
-        <div class="prop-item-price">R$ 9.000<small>pagamento único</small></div>
-        <button class="btn-add" data-id="aero-hw" data-name="Estação Aero" data-price="9000" data-type="unico" onclick="toggleItem(this)">+ Adicionar</button>
+      <div class="plano">
+        <div class="plano-nome">VentraSense Aero</div>
+        <div class="plano-preco">R$ 349<span>/mês</span></div>
+        <div class="plano-hw">HARDWARE + INSTALAÇÃO: R$ 9.000</div>
+        <ul class="plano-feats">
+          <li><span class="y">✓</span> Dashboard web completo</li>
+          <li><span class="y">✓</span> Alertas operacionais</li>
+          <li><span class="y">✓</span> Histórico de dados</li>
+          <li><span class="y">✓</span> Monitoramento 24/7</li>
+          <li><span class="y">✓</span> ATIS por voz</li>
+          <li><span class="y">✓</span> Suporte prioritário</li>
+        </ul>
+        <a href="#loja" class="btn-plano">Escolher Aero</a>
       </div>
-      <div class="prop-item">
-        <div class="prop-item-icon">📊</div>
-        <div class="prop-item-info">
-          <div class="pi-name">Plano Agro — Dashboard</div>
-          <div class="pi-desc">Acesso ao dashboard, alertas e histórico. Cobrado mensalmente</div>
-        </div>
-        <div class="prop-item-price">R$ 149<small>/mês · recorrente</small></div>
-        <button class="btn-add" data-id="agro-plan" data-name="Plano Agro" data-price="149" data-type="mes" onclick="toggleItem(this)">+ Adicionar</button>
+      <div class="plano">
+        <div class="plano-nome">Enterprise</div>
+        <div class="plano-preco">Sob<span> consulta</span></div>
+        <div class="plano-hw">MÚLTIPLAS ESTAÇÕES / PROJETOS PERSONALIZADOS</div>
+        <ul class="plano-feats">
+          <li><span class="y">✓</span> Estações ilimitadas</li>
+          <li><span class="y">✓</span> Dashboard unificado</li>
+          <li><span class="y">✓</span> Alertas avançados</li>
+          <li><span class="y">✓</span> Histórico estendido</li>
+          <li><span class="y">✓</span> ATIS por voz</li>
+          <li><span class="y">✓</span> Gerente de conta</li>
+        </ul>
+        <a href="#contato" class="btn-plano">Falar com Vendas</a>
       </div>
-      <div class="prop-item">
-        <div class="prop-item-icon">🚀</div>
-        <div class="prop-item-info">
-          <div class="pi-name">Plano Aero — Dashboard + ATIS</div>
-          <div class="pi-desc">Acesso ao dashboard, alertas, histórico, ATIS por voz e suporte prioritário</div>
-        </div>
-        <div class="prop-item-price">R$ 349<small>/mês · recorrente</small></div>
-        <button class="btn-add" data-id="aero-plan" data-name="Plano Aero + ATIS" data-price="349" data-type="mes" onclick="toggleItem(this)">+ Adicionar</button>
-      </div>
-    </div>
-
-    <div class="prop-summary">
-      <div class="ps-tag">// Resumo <span class="ps-dot"></span></div>
-      <div class="ps-items" id="ps-items">
-        <div class="ps-empty" id="ps-empty">Nenhum item adicionado</div>
-      </div>
-      <hr class="ps-divider">
-      <div class="ps-total"><span>Total único</span><span class="pt-val" id="ps-total-unico">R$ 0</span></div>
-      <div class="ps-monthly"><span>Recorrente</span><span class="pm-val" id="ps-total-mes">R$ 0/mês</span></div>
-      <button class="btn-solicitar" id="btn-sol" disabled onclick="solicitarContato()">Solicitar Contato</button>
     </div>
   </div>
 </section>
 
-<!-- MAPA -->
-<section id="mapa">
-  <div class="mapa-header rv">
-    <div class="stag">// Cobertura Nacional</div>
-    <h2 class="sh">Condições em tempo real<br>em todo o Brasil</h2>
-    <p class="sd">Dados meteorológicos ao vivo — cobertura de nuvens, vento e precipitação. Os mesmos dados que alimentam nossas estações.</p>
-  </div>
-  <div class="mapa-wrap rv">
-    <iframe
-      src="https://embed.windy.com/embed2.html?lat=-15.0&lon=-52.0&detailLat=-23.55&detailLon=-46.63&width=1200&height=520&zoom=4&level=surface&overlay=clouds&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
-      allowfullscreen>
-    </iframe>
-    <div class="mapa-legend">
-      <div class="ml-title">Legenda</div>
-      <div class="ml-item"><div class="ml-dot" style="background:oklch(.85 .01 245/.9)"></div>Cobertura de nuvens</div>
-      <div class="ml-item"><div class="ml-dot" style="background:var(--cyan);opacity:.7"></div>Precipitação</div>
-      <div class="ml-item"><div class="ml-dot" style="background:var(--amber);opacity:.7"></div>Alta pressão</div>
+<section id="loja">
+  <div class="inner">
+    <div class="s-label">// PROPOSTA</div>
+    <h2 class="s-title">Solicite sua proposta</h2>
+    <p class="s-desc">Selecione a estação e o plano desejado. Nossa equipe entrará em contato para confirmar os detalhes da instalação conforme sua localidade.</p>
+    <div class="loja-grid">
+      <div class="loja-list reveal">
+        <div class="loja-item">
+          <div class="loja-ico"><svg viewBox="0 0 52 52" fill="none" stroke="#00ff9d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M26 44 V20"/><path d="M26 28 C26 18 18 12 8 12 C8 22 16 28 26 28 Z"/><path d="M26 22 C26 14 32 9 42 9 C42 17 36 22 26 22 Z"/><path d="M14 44 H38"/></svg></div>
+          <div class="loja-info">
+            <div class="loja-name">VentraSense Agro — Estação + Instalação</div>
+            <div class="loja-desc">Estação completa com sensores, montagem, configuração e instalação inclusa</div>
+          </div>
+          <div class="loja-price">R$ 7.000<small>pagamento único</small></div>
+          <button class="btn-add" data-name="VentraSense Agro — Estação + Instalação" data-price="R$ 7.000" data-type="hardware">+ ADICIONAR</button>
+        </div>
+        <div class="loja-item">
+          <div class="loja-ico"><svg viewBox="0 0 52 52" fill="none" stroke="#00d2ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 34 L46 22 C48 21.4 49 19.8 48.4 18.2 C47.8 16.6 46 15.8 44.4 16.4 L32 21 L14 10 L9 12 L20 25 L10 29 L5 26 L2 27.5 L6 34 Z"/><path d="M14 40 H44" opacity="0.5"/></svg></div>
+          <div class="loja-info">
+            <div class="loja-name">VentraSense Aero — Estação + Instalação</div>
+            <div class="loja-desc">Estação completa para aeródromo com sensores, ATIS e instalação inclusa</div>
+          </div>
+          <div class="loja-price">R$ 9.000<small>pagamento único</small></div>
+          <button class="btn-add" data-name="VentraSense Aero — Estação + Instalação" data-price="R$ 9.000" data-type="hardware">+ ADICIONAR</button>
+        </div>
+        <div class="loja-item">
+          <div class="loja-ico"><svg viewBox="0 0 52 52" fill="none" stroke="#00ff9d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="42" height="28" rx="2"/><path d="M18 44 H34 M26 37 V44"/><path d="M12 28 L19 21 L25 25 L40 15"/></svg></div>
+          <div class="loja-info">
+            <div class="loja-name">Plano Agro — Dashboard</div>
+            <div class="loja-desc">Acesso ao dashboard, alertas e histórico. Cobrado mensalmente.</div>
+          </div>
+          <div class="loja-price">R$ 149<small>/mês — recorrente</small></div>
+          <button class="btn-add" data-name="Plano Agro" data-price="R$ 149/mês" data-type="plano">+ ADICIONAR</button>
+        </div>
+        <div class="loja-item">
+          <div class="loja-ico"><svg viewBox="0 0 52 52" fill="none" stroke="#00d2ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M26 6 C32 12 34 20 32 30 L20 30 C18 20 20 12 26 6 Z"/><circle cx="26" cy="19" r="3.5"/><path d="M20 30 L16 38 L22 35 M32 30 L36 38 L30 35"/><path d="M23 41 C24.5 43.5 27.5 43.5 29 41"/></svg></div>
+          <div class="loja-info">
+            <div class="loja-name">Plano Aero — Dashboard + ATIS</div>
+            <div class="loja-desc">Acesso ao dashboard, alertas, histórico, ATIS por voz e suporte prioritário.</div>
+          </div>
+          <div class="loja-price">R$ 349<small>/mês — recorrente</small></div>
+          <button class="btn-add" data-name="Plano Aero" data-price="R$ 349/mês" data-type="plano">+ ADICIONAR</button>
+        </div>
+      </div>
+      <aside class="carrinho hud">
+        <div class="car-head"><span>// RESUMO</span><div class="car-badge" id="cartBadge">0</div></div>
+        <div class="car-items" id="cartItems"><div class="car-empty" id="cartEmpty">NENHUM ITEM ADICIONADO</div></div>
+        <div class="car-foot">
+          <div class="car-total"><span class="car-total-l">TOTAL ÚNICO</span><span class="car-total-v" id="cartTotal">R$ 0</span></div>
+          <div class="car-mens" id="cartMens" style="display:none"><span id="cartMensVal"></span></div>
+          <button class="btn-checkout" id="btnCheckout" disabled>Solicitar Contato</button>
+        </div>
+      </aside>
     </div>
-    <div class="mapa-badge"><span class="live-dot"></span>Dados ECMWF ao vivo · Windy</div>
   </div>
 </section>
 
-<!-- DEPOIMENTOS -->
-<section id="depoimentos">
-  <div class="rv">
-    <div class="stag">// Clientes</div>
-    <h2 class="sh">Quem usa, confia</h2>
-    <p class="sd">De fazendas no cerrado a aeródromos no interior — a VentraSense já está onde o clima importa.</p>
-  </div>
-  <div class="dep-grid">
-
-    <div class="dep-card rv rv2">
-      <div class="dep-stars">★★★★★</div>
-      <p class="dep-text">A estação Agro mudou como gerencio a irrigação. Antes perdíamos lavoura por geada sem aviso. Hoje recebo alerta no celular 2 horas antes e consigo acionar o sistema a tempo.</p>
-      <div class="dep-author">
-        <div class="dep-avatar">👨‍🌾</div>
-        <div>
-          <div class="dep-name">Carlos Mendonça</div>
-          <div class="dep-role">Produtor Rural · Uberaba, MG</div>
-          <span class="dep-tag agro">Agro</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="dep-card rv rv3">
-      <div class="dep-stars">★★★★★</div>
-      <p class="dep-text">O ATIS automático em português foi um divisor de águas no nosso aeródromo. Os pilotos adoram — ouvem as condições antes de pousar sem precisar chamar o rádio. Instalação foi impecável.</p>
-      <div class="dep-author">
-        <div class="dep-avatar">✈️</div>
-        <div>
-          <div class="dep-name">Rodrigo Figueiredo</div>
-          <div class="dep-role">Gestor de Aeródromo · Jundiaí, SP</div>
-          <span class="dep-tag aero">Aero</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="dep-card rv rv4">
-      <div class="dep-stars">★★★★★</div>
-      <p class="dep-text">Usamos a VentraSense Aero no nosso heliporto há 8 meses. O dashboard tem tudo que precisamos — vento em nós, QNH, visibilidade. Suporte técnico responde rápido e resolve de verdade.</p>
-      <div class="dep-author">
-        <div class="dep-avatar">🚁</div>
-        <div>
-          <div class="dep-name">Dra. Patricia Alves</div>
-          <div class="dep-role">Diretora Operacional · Hospital Regional, GO</div>
-          <span class="dep-tag aero">Aero</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- CONTATO -->
 <section id="contato">
-  <div class="rv">
-    <div class="stag">// Contato</div>
-    <h2 class="sh">Fale com a gente</h2>
-    <p class="sd">Tem dúvidas sobre qual estação é ideal para sua propriedade ou aeródromo? Nossa equipe técnica está pronta para ajudar.</p>
-  </div>
-  <div class="contato-grid rv">
-    <div class="contato-info">
-      <div class="ci-item">
-        <div class="ci-icon">📧</div>
-        <div>
-          <div class="ci-label">E-mail</div>
-          <div class="ci-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="77141819031603183701121903051604121904125914181a591505">[email&#160;protected]</a></div>
+  <div class="inner">
+    <div class="s-label">// CONTATO</div>
+    <h2 class="s-title">Fale com a gente</h2>
+    <div class="cont-grid reveal">
+      <div class="cont-info">
+        <p>Tem dúvidas sobre qual estação é ideal para sua propriedade ou aeródromo? Nossa equipe técnica está pronta para ajudar.</p>
+        <div class="cont-item">
+          <div class="cont-ico"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 7 L12 13 L22 7"/></svg></div>
+          <div><div class="cont-label">E-MAIL</div><div class="cont-val">contato@ventrasense.com.br</div></div>
+        </div>
+        <div class="cont-item">
+          <div class="cont-ico"><svg viewBox="0 0 24 24"><path d="M12 21 C12 21 5 14.5 5 9.5 C5 5.9 8.1 3 12 3 C15.9 3 19 5.9 19 9.5 C19 14.5 12 21 12 21 Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+          <div><div class="cont-label">LOCALIZAÇÃO</div><div class="cont-val">Brasil</div></div>
+        </div>
+        <div class="cont-item">
+          <div class="cont-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15.5 14"/></svg></div>
+          <div><div class="cont-label">RESPOSTA</div><div class="cont-val">Em até 24 horas úteis</div></div>
         </div>
       </div>
-      <div class="ci-item">
-        <div class="ci-icon">📍</div>
-        <div>
-          <div class="ci-label">Localização</div>
-          <div class="ci-val">Brasil</div>
-        </div>
-      </div>
-      <div class="ci-item">
-        <div class="ci-icon">⏱️</div>
-        <div>
-          <div class="ci-label">Resposta</div>
-          <div class="ci-val">Em até 24 horas úteis</div>
-        </div>
-      </div>
+      <form class="cont-form" id="formContato">
+        <input type="text" class="input" id="cNome" placeholder="Seu nome" required/>
+        <input type="email" class="input" id="cEmail" placeholder="Seu e-mail" required/>
+        <input type="text" class="input" id="cAssunto" placeholder="Assunto (ex: Orçamento Agro, Dúvida Aero...)"/>
+        <textarea class="input" id="cMsg" placeholder="Sua mensagem..." required></textarea>
+        <button type="submit" class="btn-send">Enviar Mensagem</button>
+      </form>
     </div>
-    <form class="contato-form" onsubmit="submitForm(event)">
-      <div class="form-row">
-        <div class="form-field">
-          <label>Seu nome</label>
-          <input type="text" placeholder="João Silva" required>
-        </div>
-        <div class="form-field">
-          <label>Seu e-mail</label>
-          <input type="email" placeholder="joao@email.com" required>
-        </div>
-      </div>
-      <div class="form-field">
-        <label>Assunto</label>
-        <input type="text" placeholder="ex: Orçamento Agro, Dúvida Aero...">
-      </div>
-      <div class="form-field">
-        <label>Sua mensagem</label>
-        <textarea placeholder="Descreva sua necessidade ou dúvida..."></textarea>
-      </div>
-      <button type="submit" class="btn-send">Enviar Mensagem</button>
-    </form>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <div class="logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M8 1v3M8 12v3M1 8h3M12 8h3M3.05 3.05l2.12 2.12M10.83 10.83l2.12 2.12M3.05 12.95l2.12-2.12M10.83 5.17l2.12-2.12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        </div>
-        <span class="logo-text">VENTRA<span>SENSE</span></span>
-      </div>
-      <p>Fabricante brasileiro de estações meteorológicas profissionais para agronegócio e operações aeronáuticas. Hardware robusto, software inteligente.</p>
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <span class="nav-logo-text">VENTRA<b>SENSE</b></span>
+      <p>Estações meteorológicas inteligentes para o agronegócio e operações aeronáuticas. Do plantio ao pouso, dados precisos para decisões certas.</p>
     </div>
-    <div class="footer-col">
+    <div class="foot-col">
       <h4>Produtos</h4>
       <ul>
         <li><a href="#produtos">VentraSense Agro</a></li>
         <li><a href="#produtos">VentraSense Aero</a></li>
         <li><a href="#planos">Planos e Preços</a></li>
-        <li><a href="#proposta">Solicitar Proposta</a></li>
+        <li><a href="#loja">Solicitar Proposta</a></li>
       </ul>
     </div>
-    <div class="footer-col">
+    <div class="foot-col">
       <h4>Empresa</h4>
       <ul>
-        <li><a href="#">Sobre nós</a></li>
-        <li><a href="#">Diferenciais</a></li>
-        <li><a href="#">Blog</a></li>
+        <li><a href="#diferenciais">Diferenciais</a></li>
         <li><a href="#contato">Contato</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Acesso</h4>
-      <ul>
-        <li><a href="https://dashboard.ventrasense.com.br">O Dashboard</a></li>
-        <li><a href="https://dashboard.ventrasense.com.br">Área do Cliente</a></li>
-        <li><a href="#">App Mobile</a></li>
-        <li><a href="#">Suporte</a></li>
+        <li><a href="#" id="footLogin">Área do Cliente</a></li>
+        <li><a href="privacidade.html">Política de Privacidade</a></li>
       </ul>
     </div>
   </div>
-  <div class="footer-bottom">
-    <p>© 2025 VentraSense. Todos os direitos reservados.</p>
-    <span class="footer-mono">ventrasense.com.br</span>
+  <div class="foot-bottom">
+    <span class="foot-copy">© 2026 VENTRASENSE — TODOS OS DIREITOS RESERVADOS</span>
+    <span class="foot-status"><i></i>TODOS OS SISTEMAS OPERACIONAIS</span>
+    <span class="foot-copy">ventrasense.com.br</span>
   </div>
 </footer>
 
-<!-- TWEAKS -->
-<div id="tweaks-panel">
-  <h3>Tweaks</h3>
-  <div class="tw-row">
-    <label>Cor de destaque</label>
-    <select id="tw-hue" onchange="applyTweaks()">
-      <option value="200">Ciano (padrão)</option>
-      <option value="280">Violeta</option>
-      <option value="140">Esmeralda</option>
-      <option value="30">Âmbar</option>
-    </select>
-  </div>
-  <div class="tw-row">
-    <label>Brilho de fundo</label>
-    <input type="range" id="tw-bg" min="0.08" max="0.20" step="0.01" value="0.10" oninput="applyTweaks()">
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal hud">
+    <button class="modal-close" id="modalClose" aria-label="Fechar">✕</button>
+    <div id="modalLogin">
+      <div class="modal-label">// ACESSO</div>
+      <div class="modal-title">Área do Cliente</div>
+      <div class="form-tabs">
+        <button class="form-tab active" id="tabBtnLogin">LOGIN</button>
+        <button class="form-tab" id="tabBtnCad">SOLICITAR ACESSO</button>
+      </div>
+      <div id="tabLogin">
+        <div class="form-group"><label class="form-label">Usuário</label><input type="text" class="input" placeholder="seu-usuario"/></div>
+        <div class="form-group"><label class="form-label">Senha</label><input type="password" class="input" placeholder="••••••••"/></div>
+        <button class="btn-modal" id="btnGoDash">Acessar Dashboard</button>
+      </div>
+      <div id="tabCadastro" style="display:none">
+        <div class="form-group"><label class="form-label">Nome</label><input type="text" class="input" id="cadNome" placeholder="Seu nome completo"/></div>
+        <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="input" id="cadEmail" placeholder="seu@email.com"/></div>
+        <div class="form-group"><label class="form-label">Tipo de Operação</label><input type="text" class="input" id="cadTipo" placeholder="Agronegócio / Aeródromo / Outro"/></div>
+        <button class="btn-modal" id="btnSolicitar">Solicitar Acesso</button>
+      </div>
+    </div>
+    <div id="modalCheckout" style="display:none">
+      <div class="modal-label">// PEDIDO</div>
+      <div class="modal-title">Solicitar Contato</div>
+      <p style="color:var(--muted);font-size:0.88rem;line-height:1.7;margin-bottom:24px">Após confirmar, nossa equipe entrará em contato em até 24h para validar sua localidade, alinhar a instalação e processar a proposta comercial.</p>
+      <div class="form-group"><label class="form-label">Nome completo</label><input type="text" class="input" id="ckNome" placeholder="Seu nome"/></div>
+      <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="input" id="ckEmail" placeholder="seu@email.com"/></div>
+      <div class="form-group"><label class="form-label">WhatsApp</label><input type="text" class="input" id="ckZap" placeholder="(00) 00000-0000"/></div>
+      <div class="form-group"><label class="form-label">Localidade / Propriedade</label><input type="text" class="input" id="ckLocal" placeholder="Cidade - Estado"/></div>
+      <button class="btn-modal" id="btnConfirm">Confirmar Solicitação</button>
+    </div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ── Theme toggle ────────────────────────
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light');
-  document.getElementById('theme-toggle').textContent = isLight ? '🌙' : '☀️';
-  localStorage.setItem('vs-theme', isLight ? 'light' : 'dark');
-}
-(function(){
-  if(localStorage.getItem('vs-theme') === 'light') {
-    document.body.classList.add('light');
-    const btn = document.getElementById('theme-toggle');
-    if(btn) btn.textContent = '🌙';
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pad = function (n, w) { return String(n).padStart(w || 2, '0'); };
+
+  /* ===== Relógio UTC + altímetro de scroll ===== */
+  function tickClock() {
+    var d = new Date();
+    $('utcClock').textContent = pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) + 'Z';
   }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  var altEl = $('altRead');
+  function updateAlt() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = max > 0 ? window.scrollY / max : 0;
+    altEl.textContent = pad(Math.round(pct * 10500), 5) + 'FT';
+  }
+  window.addEventListener('scroll', updateAlt, { passive: true });
+  updateAlt();
+
+  /* ===== Menu mobile ===== */
+  var navLinks = $('navLinks');
+  $('burger').addEventListener('click', function () { navLinks.classList.toggle('open'); });
+  navLinks.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') navLinks.classList.remove('open');
+  });
+
+  /* ===== Reveal on scroll ===== */
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) { if (en.isIntersecting) en.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(function (el) { obs.observe(el); });
+
+  /* ===== Campo de vento (canvas) ===== */
+  var cv = $('fx');
+  var ctx = cv.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 0, H = 0, parts = [], raf = null, heroVisible = true;
+
+  function fieldAngle(x, y, t) {
+    return Math.sin(y * 0.0011 + t * 0.00022) * 0.9 +
+           Math.sin(x * 0.0007 - t * 0.00013) * 0.45 +
+           Math.sin((x + y) * 0.0004 + t * 0.00008) * 0.35;
+  }
+  function spawn(edge) {
+    return {
+      x: edge ? -10 : Math.random() * W,
+      y: Math.random() * H,
+      v: 0.5 + Math.random() * 1.2,
+      life: 90 + Math.random() * 140,
+      g: Math.random() < 0.24
+    };
+  }
+  function sizeCanvas() {
+    var r = cv.parentElement.getBoundingClientRect();
+    W = cv.width = Math.round(r.width * DPR);
+    H = cv.height = Math.round(r.height * DPR);
+    cv.style.width = r.width + 'px';
+    cv.style.height = r.height + 'px';
+    var n = Math.min(220, Math.max(60, Math.round(r.width * r.height / 9000)));
+    parts = [];
+    for (var i = 0; i < n; i++) parts.push(spawn(false));
+    ctx.fillStyle = '#04090f';
+    ctx.fillRect(0, 0, W, H);
+  }
+  function step(t) {
+    ctx.fillStyle = 'rgba(4,9,15,0.085)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.lineWidth = DPR;
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      var a = fieldAngle(p.x, p.y, t);
+      var nx = p.x + (Math.cos(a) * p.v * 1.5 + 0.7) * DPR;
+      var ny = p.y + Math.sin(a) * p.v * 0.9 * DPR;
+      ctx.strokeStyle = p.g ? 'rgba(0,255,157,0.42)' : 'rgba(0,210,255,0.4)';
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(nx, ny);
+      ctx.stroke();
+      p.x = nx; p.y = ny; p.life--;
+      if (p.life < 0 || p.x > W + 20 || p.y < -20 || p.y > H + 20) parts[i] = spawn(true);
+    }
+    raf = requestAnimationFrame(step);
+  }
+  function startFx() { if (!raf && !reducedMotion && heroVisible && !document.hidden) raf = requestAnimationFrame(step); }
+  function stopFx() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+  if (!reducedMotion) {
+    sizeCanvas();
+    startFx();
+    var rsz;
+    window.addEventListener('resize', function () { clearTimeout(rsz); rsz = setTimeout(sizeCanvas, 180); });
+    new IntersectionObserver(function (en) {
+      heroVisible = en[0].isIntersecting;
+      heroVisible ? startFx() : stopFx();
+    }, { threshold: 0 }).observe($('hero'));
+    document.addEventListener('visibilitychange', function () { document.hidden ? stopFx() : startFx(); });
+  }
+
+  /* ===== Ticks da bússola ===== */
+  (function () {
+    var g = $('ticks'), parts = [];
+    for (var i = 0; i < 36; i++) {
+      var major = i % 9 === 0;
+      var a = i * 10 * Math.PI / 180;
+      var r1 = major ? 86 : 91, r2 = 96;
+      var x1 = 110 + r1 * Math.sin(a), y1 = 110 - r1 * Math.cos(a);
+      var x2 = 110 + r2 * Math.sin(a), y2 = 110 - r2 * Math.cos(a);
+      parts.push('<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '"' + (major ? ' stroke="#2a5273" stroke-width="2"' : '') + '/>');
+    }
+    g.innerHTML = parts.join('');
+  })();
+
+  /* ===== Simulação de telemetria ===== */
+  var S = {
+    temp: 24.3, hum: 62, kt: 8, dirC: 90, qnh: 1018.2, rain: 0,
+    tTemp: 24.3, tHum: 62, tKt: 8, tQnh: 1018.2,
+    trend: 1
+  };
+  var qnhHist = [];
+  for (var qi = 0; qi < 24; qi++) qnhHist.push(1018.2 + Math.sin(qi * 0.5) * 0.8);
+
+  function rollTargets() {
+    var prevT = S.tTemp;
+    S.tTemp = Math.min(33, Math.max(15, S.tTemp + (Math.random() - 0.5) * 1.6));
+    S.trend = S.tTemp >= prevT ? 1 : -1;
+    S.tHum = Math.min(96, Math.max(30, S.tHum + (Math.random() - 0.5) * 7));
+    S.tKt = Math.min(18, Math.max(2, S.tKt + (Math.random() - 0.5) * 4));
+    S.tQnh = Math.min(1026, Math.max(1010, S.tQnh + (Math.random() - 0.5) * 1.2));
+    S.dirC += (Math.random() - 0.5) * 56;
+    if (Math.random() < 0.06) S.rain = +(S.rain + 0.2).toFixed(1);
+    qnhHist.push(S.tQnh);
+    if (qnhHist.length > 24) qnhHist.shift();
+    drawSpark();
+  }
+  function drawSpark() {
+    var min = Math.min.apply(null, qnhHist), max = Math.max.apply(null, qnhHist);
+    var rng = (max - min) || 1;
+    var pts = qnhHist.map(function (v, i) {
+      var x = (i * (120 / (qnhHist.length - 1))).toFixed(1);
+      var y = (29 - ((v - min) / rng) * 24).toFixed(1);
+      return x + ',' + y;
+    });
+    $('sparkLine').setAttribute('points', pts.join(' '));
+    $('sparkArea').setAttribute('points', '0,34 ' + pts.join(' ') + ' 120,34');
+  }
+  drawSpark();
+
+  function lerp(a, b, k) { return a + (b - a) * k; }
+  function renderSim() {
+    S.temp = lerp(S.temp, S.tTemp, 0.08);
+    S.hum = lerp(S.hum, S.tHum, 0.08);
+    S.kt = lerp(S.kt, S.tKt, 0.1);
+    S.qnh = lerp(S.qnh, S.tQnh, 0.06);
+    var dew = S.temp - (100 - S.hum) / 5;
+    var dirDisp = ((Math.round(S.dirC) % 360) + 360) % 360;
+    $('iTemp').textContent = S.temp.toFixed(1);
+    $('iDew').textContent = dew.toFixed(1) + '°C';
+    var tr = $('iTempTrend');
+    tr.textContent = S.trend > 0 ? '▲' : '▼';
+    tr.className = 'trend ' + (S.trend > 0 ? 'up' : 'dn');
+    $('iHum').textContent = Math.round(S.hum);
+    $('iHumBar').style.width = Math.round(S.hum) + '%';
+    $('iKt').textContent = Math.round(S.kt);
+    $('iKmh').textContent = Math.round(S.kt * 1.852);
+    $('iDir').textContent = pad(dirDisp, 3) + '°';
+    $('iQnh').textContent = Math.round(S.qnh);
+    $('iRain').textContent = S.rain.toFixed(1);
+    $('iRainBar').style.width = Math.min(100, S.rain * 10) + '%';
+    $('needle').style.transform = 'rotate(' + S.dirC.toFixed(1) + 'deg)';
+  }
+  rollTargets();
+  renderSim();
+  setInterval(rollTargets, 5000);
+  setInterval(renderSim, reducedMotion ? 1500 : 140);
+
+  /* ===== Pacotes RX ===== */
+  var pkt = 8412 + Math.floor(Math.random() * 400);
+  var nextRx = 10;
+  function rxPulse() {
+    pkt++;
+    var d = new Date();
+    $('pktNum').textContent = '#' + pad(pkt, 5);
+    $('rxTime').textContent = pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) + 'Z';
+    var led = $('rxLed');
+    led.classList.add('on');
+    setTimeout(function () { led.classList.remove('on'); }, 800);
+  }
+  rxPulse();
+  setInterval(function () {
+    nextRx--;
+    if (nextRx <= 0) { nextRx = 10; rxPulse(); }
+    $('rxNext').textContent = nextRx + 'S';
+  }, 1000);
+
+  /* ===== Ticker METAR ===== */
+  function buildTickerGroup() {
+    var d = new Date();
+    var dir = pad(((Math.round(S.dirC) % 360) + 360) % 360, 3);
+    var kt = pad(Math.round(S.kt), 2);
+    var t = Math.round(S.temp), dp = Math.round(S.temp - (100 - S.hum) / 5);
+    var q = Math.round(S.qnh);
+    var metar = 'METAR VTRS ' + pad(d.getUTCDate()) + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + 'Z ' + dir + kt + 'KT CAVOK ' + pad(t) + '/' + pad(dp) + ' Q' + q + '=';
+    var items = [
+      '<b>' + metar + '</b>',
+      'VENTO ' + dir + '° / ' + kt + 'KT',
+      'TEMP ' + S.temp.toFixed(1) + '°C',
+      'UMID ' + Math.round(S.hum) + '%',
+      'QNH ' + q + ' hPa',
+      'CHUVA 24H ' + S.rain.toFixed(1) + 'MM',
+      'ALERTA GEADA <span class="ok">NEGATIVO</span>',
+      'LINK NUVEM <span class="ok">ONLINE ●</span>',
+      'TELEMETRIA A CADA 10S',
+      'DO PLANTIO AO POUSO'
+    ];
+    return items.map(function (s) { return '<span class="ti">' + s + '</span><span class="sep">◆</span>'; }).join('');
+  }
+  var track = $('tickerTrack');
+  function refreshTicker() {
+    var g = buildTickerGroup();
+    track.innerHTML = g + g;
+  }
+  refreshTicker();
+  track.addEventListener('animationiteration', refreshTicker);
+
+  /* ===== ATIS por voz ===== */
+  var PHON = ['Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliett', 'Kilo', 'Lima', 'Mike', 'November', 'Oscar', 'Papa', 'Quebec', 'Romeo', 'Sierra', 'Tango', 'Uniform', 'Victor', 'Whiskey', 'Xray', 'Yankee', 'Zulu'];
+  var DIG = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'meia', 'sete', 'oito', 'nove'];
+  function digitsPt(s) {
+    return String(s).split('').map(function (c) { return DIG[+c]; }).join(' ');
+  }
+  function buildAtis() {
+    var d = new Date();
+    var hh = pad(d.getUTCHours()), mm = pad(d.getUTCMinutes());
+    var letter = PHON[d.getUTCHours() % PHON.length];
+    var dir = pad(((Math.round(S.dirC) % 360) + 360) % 360, 3);
+    var kt = Math.round(S.kt);
+    var t = Math.round(S.temp);
+    var dp = Math.round(S.temp - (100 - S.hum) / 5);
+    var q = Math.round(S.qnh);
+    var text =
+      'VENTRASENSE AERO — INFORMAÇÃO ' + letter.toUpperCase() + '\n' +
+      hh + mm + ' ZULU\n' +
+      'VENTO ' + dir + ' GRAUS / ' + pad(kt, 2) + ' NÓS\n' +
+      'VISIBILIDADE ACIMA DE 10 KM\n' +
+      'CÉU CLARO\n' +
+      'TEMPERATURA ' + t + '°C / ORVALHO ' + dp + '°C\n' +
+      'QNH ' + q + ' HPA\n' +
+      'OPERAÇÕES NORMAIS NA PISTA\n' +
+      'AO CONTATO INICIAL, INFORME ' + letter.toUpperCase();
+    var spoken =
+      'VentraSense Aero, informação ' + letter + ', ' + hh + ' ' + mm + ' Zulu. ' +
+      'Vento, ' + digitsPt(dir) + ' graus, ' + kt + ' nós. ' +
+      'Visibilidade, acima de dez quilômetros. Céu claro. ' +
+      'Temperatura, ' + t + ' graus. Ponto de orvalho, ' + dp + ' graus. ' +
+      'Q N H, ' + digitsPt(q) + ', hectopascais. ' +
+      'Operações normais na pista. Ao contato inicial, informe ' + letter + '.';
+    return { text: text, spoken: spoken };
+  }
+
+  var atisBox = $('atisBox'), atisText = $('atisText');
+  var btnPlay = $('atisPlay'), btnStop = $('atisStop');
+  var typeTimer = null;
+  var ttsOk = 'speechSynthesis' in window;
+
+  function typeText(full) {
+    clearInterval(typeTimer);
+    var i = 0;
+    typeTimer = setInterval(function () {
+      i += 1;
+      if (i >= full.length) {
+        i = full.length;
+        clearInterval(typeTimer);
+        atisText.innerHTML = escapeHtml(full) + '<span class="caret">█</span>';
+        return;
+      }
+      atisText.innerHTML = escapeHtml(full.slice(0, i)) + '<span class="caret">█</span>';
+    }, 26);
+  }
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function atisIdle() {
+    atisBox.classList.remove('speaking');
+    btnPlay.disabled = false;
+    btnStop.disabled = true;
+  }
+  function pickVoice() {
+    var vs = window.speechSynthesis.getVoices();
+    var br = vs.filter(function (v) { return /pt[-_]BR/i.test(v.lang); });
+    if (br.length) return br[0];
+    var pt = vs.filter(function (v) { return /^pt/i.test(v.lang); });
+    return pt.length ? pt[0] : null;
+  }
+  btnPlay.addEventListener('click', function () {
+    var atis = buildAtis();
+    typeText(atis.text);
+    if (!ttsOk) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(atis.spoken);
+    u.lang = 'pt-BR';
+    u.rate = 0.95;
+    u.pitch = 0.9;
+    var v = pickVoice();
+    if (v) u.voice = v;
+    u.onend = atisIdle;
+    u.onerror = atisIdle;
+    atisBox.classList.add('speaking');
+    btnPlay.disabled = true;
+    btnStop.disabled = false;
+    window.speechSynthesis.speak(u);
+  });
+  btnStop.addEventListener('click', function () {
+    if (ttsOk) window.speechSynthesis.cancel();
+    atisIdle();
+  });
+  if (!ttsOk) {
+    btnPlay.textContent = '▶ GERAR BOLETIM';
+    document.querySelector('.atis-note').textContent = 'Seu navegador não suporta síntese de voz — o boletim será exibido em texto.';
+  }
+
+  /* ===== Carrinho ===== */
+  var cart = [];
+  var EMAIL = 'contato@ventrasense.com.br';
+
+  document.querySelectorAll('.btn-add').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.classList.contains('added')) return;
+      btn.classList.add('added');
+      btn.textContent = '✓ ADICIONADO';
+      cart.push({ name: btn.dataset.name, price: btn.dataset.price, type: btn.dataset.type });
+      renderCart();
+    });
+  });
+
+  function removeFromCart(idx) {
+    var item = cart.splice(idx, 1)[0];
+    document.querySelectorAll('.btn-add.added').forEach(function (btn) {
+      if (btn.dataset.name === item.name) {
+        btn.classList.remove('added');
+        btn.textContent = '+ ADICIONAR';
+      }
+    });
+    renderCart();
+  }
+
+  function renderCart() {
+    var container = $('cartItems');
+    var badge = $('cartBadge');
+    var totalEl = $('cartTotal');
+    var mensEl = $('cartMens');
+    var mensVal = $('cartMensVal');
+    var btnCk = $('btnCheckout');
+
+    badge.textContent = cart.length;
+    container.innerHTML = '';
+
+    if (cart.length === 0) {
+      container.innerHTML = '<div class="car-empty">NENHUM ITEM ADICIONADO</div>';
+      totalEl.textContent = 'R$ 0';
+      mensEl.style.display = 'none';
+      btnCk.disabled = true;
+      return;
+    }
+    btnCk.disabled = false;
+
+    var totalHw = 0, mensal = [];
+    cart.forEach(function (item, idx) {
+      var div = document.createElement('div');
+      div.className = 'car-item';
+      var nm = document.createElement('span');
+      nm.className = 'car-item-name';
+      nm.textContent = item.name;
+      var pr = document.createElement('span');
+      pr.className = 'car-item-price';
+      pr.textContent = item.price;
+      var rm = document.createElement('button');
+      rm.className = 'car-item-rm';
+      rm.textContent = '✕';
+      rm.setAttribute('aria-label', 'Remover ' + item.name);
+      rm.addEventListener('click', function () { removeFromCart(idx); });
+      div.appendChild(nm); div.appendChild(pr); div.appendChild(rm);
+      container.appendChild(div);
+      if (item.type === 'plano') mensal.push(item.price);
+      else totalHw += parseInt(item.price.replace(/\D/g, ''), 10) || 0;
+    });
+
+    totalEl.textContent = 'R$ ' + totalHw.toLocaleString('pt-BR');
+    if (mensal.length) {
+      mensEl.style.display = 'block';
+      mensVal.textContent = '+ ' + mensal.join(' + ') + ' (recorrente)';
+    } else {
+      mensEl.style.display = 'none';
+    }
+  }
+
+  /* ===== Modal ===== */
+  var overlay = $('modalOverlay');
+  function openModal(which) {
+    overlay.classList.add('open');
+    $('modalLogin').style.display = which === 'login' ? 'block' : 'none';
+    $('modalCheckout').style.display = which === 'checkout' ? 'block' : 'none';
+  }
+  function closeModal() { overlay.classList.remove('open'); }
+  $('navLogin').addEventListener('click', function (e) { e.preventDefault(); openModal('login'); });
+  $('footLogin').addEventListener('click', function (e) { e.preventDefault(); openModal('login'); });
+  $('btnCheckout').addEventListener('click', function () { openModal('checkout'); });
+  $('modalClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+  $('tabBtnLogin').addEventListener('click', function () { switchTab('login'); });
+  $('tabBtnCad').addEventListener('click', function () { switchTab('cad'); });
+  function switchTab(t) {
+    $('tabBtnLogin').classList.toggle('active', t === 'login');
+    $('tabBtnCad').classList.toggle('active', t === 'cad');
+    $('tabLogin').style.display = t === 'login' ? 'block' : 'none';
+    $('tabCadastro').style.display = t === 'cad' ? 'block' : 'none';
+  }
+
+  $('btnGoDash').addEventListener('click', function () {
+    window.open('https://estacao-meteorologica.onrender.com', '_blank');
+  });
+
+  $('btnSolicitar').addEventListener('click', function () {
+    var body = 'Solicitação de acesso à Área do Cliente%0D%0A%0D%0ANome: ' + encodeURIComponent($('cadNome').value) +
+      '%0D%0AE-mail: ' + encodeURIComponent($('cadEmail').value) +
+      '%0D%0ATipo de operação: ' + encodeURIComponent($('cadTipo').value);
+    window.location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent('Solicitação de Acesso — VentraSense') + '&body=' + body;
+  });
+
+  $('btnConfirm').addEventListener('click', function () {
+    var lines = ['Solicitação de proposta VentraSense', ''];
+    cart.forEach(function (i) { lines.push('- ' + i.name + ' (' + i.price + ')'); });
+    lines.push('');
+    lines.push('Nome: ' + $('ckNome').value);
+    lines.push('E-mail: ' + $('ckEmail').value);
+    lines.push('WhatsApp: ' + $('ckZap').value);
+    lines.push('Localidade: ' + $('ckLocal').value);
+    window.location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent('Proposta VentraSense') + '&body=' + encodeURIComponent(lines.join('\n'));
+  });
+
+  /* ===== Formulário de contato ===== */
+  $('formContato').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var subject = $('cAssunto').value || 'Contato pelo site — VentraSense';
+    var body = $('cMsg').value + '\n\n— ' + $('cNome').value + ' (' + $('cEmail').value + ')';
+    window.location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  });
 })();
-
-// ── Nav scroll ──────────────────────────
-window.addEventListener('scroll', () => {
-  document.getElementById('nav').classList.toggle('scrolled', scrollY > 40);
-});
-
-// ── Reveal ──────────────────────────────
-const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); }), {threshold: 0.1});
-document.querySelectorAll('.rv').forEach(el => obs.observe(el));
-
-// Live sensor cards
-function jit(base, range) { return (base + (Math.random()-.5)*range).toFixed(1); }
-function updateCards() {
-  const t = document.getElementById('hc-temp');
-  const h = document.getElementById('hc-hum');
-  const w = document.getElementById('hc-wind');
-  const s = document.getElementById('sp-t');
-  if(t) t.innerHTML = jit(23.4,.5) + '<span class="sunit">\u00b0C</span>';
-  if(h) h.innerHTML = jit(67,2)    + '<span class="sunit">%</span>';
-  if(w) w.innerHTML = jit(14.2,2)  + '<span class="sunit">km/h</span>';
-  if(s) s.textContent = jit(24.1,.5);
-}
-setInterval(updateCards, 2500);
-
-// ── Proposta builder ─────────────────────
-const cart = {};
-function toggleItem(btn) {
-  const {id, name, price, type} = btn.dataset;
-  if(cart[id]) {
-    delete cart[id];
-    btn.textContent = '+ Adicionar';
-    btn.classList.remove('active');
-  } else {
-    cart[id] = {name, price: parseInt(price), type};
-    btn.textContent = '− Remover';
-    btn.classList.add('active');
-  }
-  renderSummary();
-}
-
-function renderSummary() {
-  const keys = Object.keys(cart);
-  const el = document.getElementById('ps-items');
-  const empty = document.getElementById('ps-empty');
-  const btn = document.getElementById('btn-sol');
-  let totalUnico = 0, totalMes = 0;
-
-  if(keys.length === 0) {
-    el.innerHTML = '<div class="ps-empty" id="ps-empty">Nenhum item adicionado</div>';
-    document.getElementById('ps-total-unico').textContent = 'R$ 0';
-    document.getElementById('ps-total-mes').textContent = 'R$ 0/mês';
-    btn.disabled = true;
-    return;
-  }
-
-  el.innerHTML = keys.map(k => {
-    const item = cart[k];
-    if(item.type === 'unico') totalUnico += item.price;
-    else totalMes += item.price;
-    const val = item.type === 'unico'
-      ? 'R$ ' + item.price.toLocaleString('pt-BR')
-      : 'R$ ' + item.price + '/mês';
-    return `<div class="ps-item"><span class="ps-item-name">${item.name}</span><span class="ps-item-val">${val}</span></div>`;
-  }).join('');
-
-  document.getElementById('ps-total-unico').textContent = 'R$ ' + totalUnico.toLocaleString('pt-BR');
-  document.getElementById('ps-total-mes').textContent = totalMes > 0 ? 'R$ ' + totalMes + '/mês' : 'R$ 0/mês';
-  btn.disabled = false;
-}
-
-function solicitarContato() {
-  const keys = Object.keys(cart);
-  const itens = keys.map(k => cart[k].name).join(', ');
-  document.querySelector('#contato input[type=text]').value = 'Proposta: ' + itens;
-  document.querySelector('#contato').scrollIntoView({block:'start'});
-}
-
-function submitForm(e) {
-  e.preventDefault();
-  const btn = e.target.querySelector('.btn-send');
-  btn.textContent = 'Enviado! ✓';
-  btn.style.background = 'var(--green)';
-  setTimeout(() => { btn.textContent = 'Enviar Mensagem'; btn.style.background = ''; }, 3000);
-}
-
-// ── Tweaks ───────────────────────────────
-const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "accentHue": "200",
-  "bgBrightness": "0.1"
-}/*EDITMODE-END*/;
-
-function applyTweaks() {
-  const hue = document.getElementById('tw-hue').value;
-  const bg  = parseFloat(document.getElementById('tw-bg').value);
-  document.documentElement.style.setProperty('--cyan', `oklch(0.78 0.17 ${hue})`);
-  document.documentElement.style.setProperty('--cyan-glow', `oklch(0.78 0.17 ${hue} / 0.18)`);
-  document.documentElement.style.setProperty('--bg',  `oklch(${bg} 0.025 245)`);
-  document.documentElement.style.setProperty('--bg2', `oklch(${(bg+.04).toFixed(3)} 0.022 245)`);
-  document.documentElement.style.setProperty('--bg3', `oklch(${(bg+.08).toFixed(3)} 0.020 242)`);
-  window.parent.postMessage({type:'__edit_mode_set_keys', edits:{accentHue:hue, bgBrightness:String(bg)}}, '*');
-}
-(function(){
-  const d = TWEAK_DEFAULTS;
-  if(d.accentHue) document.getElementById('tw-hue').value = d.accentHue;
-  if(d.bgBrightness) document.getElementById('tw-bg').value = d.bgBrightness;
-  applyTweaks();
-})();
-
-window.addEventListener('message', e => {
-  if(e.data?.type === '__activate_edit_mode')   document.getElementById('tweaks-panel').style.display = 'block';
-  if(e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
-});
-window.parent.postMessage({type:'__edit_mode_available'}, '*');
 </script>
 </body>
 </html>
