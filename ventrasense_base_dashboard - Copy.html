@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VentraSense Base | Centro de Operações · Dark Build v5</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script>
+    window.VS_CONFIG = window.VS_CONFIG || {
+      DECEA_API_KEY: '',
+      DECEA_AERODROMES_URL: '',
+      DECEA_AUTH_HEADER: 'Authorization',
+      DECEA_AUTH_PREFIX: 'Bearer'
+    };
+  </script>
+  <style>
+    :root{
+      --bg:#04090f;
+      --bg2:#070f1a;
+      --bg3:#0a1622;
+      --panel:#0c1a2c;
+      --panel-hi:#0f2238;
+      --line:#13283f;
+      --line-strong:#1d3c5e;
+      --text:#cfe2f3;
+      --muted:#54748f;
+      --accent:#00d2ff;
+      --accent-2:#00ff9d;
+      --warning:#ffb340;
+      --shadow:0 18px 38px rgba(0,0,0,.35);
+      --radius:22px;
+      --font:'Space Grotesk',sans-serif;
+      --mono:'JetBrains Mono',monospace;
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;color-scheme:dark}
+    body{
+      margin:0;
+      overflow:hidden;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(circle at 16% 14%,rgba(0,210,255,.1),transparent 22%),
+        radial-gradient(circle at 84% 12%,rgba(0,255,157,.08),transparent 20%),
+        linear-gradient(180deg,var(--bg) 0%,#060d16 100%);
+    }
+    body::before{
+      content:"";
+      position:fixed;inset:0;pointer-events:none;
+      background-image:
+        linear-gradient(rgba(0,210,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,210,255,.035) 1px,transparent 1px),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size:64px 64px,64px 64px,auto;
+      opacity:.35;
+    }
+    #map{position:fixed;inset:0;z-index:1;background:#06111b}
+    .topbar{
+      position:fixed;top:14px;left:14px;right:14px;z-index:40;
+      display:flex;align-items:center;gap:10px;padding:10px 12px;flex-wrap:nowrap;max-height:72px;overflow:hidden;
+      border:1px solid var(--line);border-radius:20px;
+      background:rgba(4,9,15,.82);
+      box-shadow:var(--shadow);backdrop-filter:blur(18px)
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:0;flex:0 0 auto}
+    .brand-mark{
+      width:34px;height:34px;border-radius:999px;display:grid;place-items:center;
+      font-weight:700;font-size:.9rem;color:var(--bg);background:linear-gradient(145deg,var(--cyan),var(--accent-2));
+      box-shadow:0 0 0 1px rgba(0,255,157,.12),0 12px 26px rgba(0,210,255,.18)
+    }
+    .brand-copy h1{margin:0;font-size:.92rem;line-height:1.05;letter-spacing:.24em;text-transform:uppercase;color:var(--white)}
+    .brand-copy p{margin:2px 0 0;font-size:.72rem;color:var(--muted)}
+    .top-stats{display:flex;gap:6px;flex-wrap:wrap;min-width:0;flex:1;justify-content:center;align-items:center}
+    .stat-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(12,26,44,.84);color:var(--muted);font-size:.75rem;white-space:nowrap}
+    .stat-chip strong{color:var(--text)}
+    .top-actions{display:flex;gap:8px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;max-width:48vw}
+    .btn{
+      appearance:none;border:1px solid var(--line-strong);background:rgba(12,26,44,.88);color:var(--text);
+      padding:8px 12px;border-radius:14px;font:inherit;font-weight:700;cursor:pointer;
+      transition:transform .16s ease,border-color .16s ease,background .16s ease,font-size:.88rem;line-height:1
+    }
+    .btn:hover{transform:translateY(-1px);border-color:rgba(0,210,255,.5);background:rgba(0,210,255,.08)}
+    .btn-primary{border-color:rgba(0,210,255,.42);background:linear-gradient(145deg,rgba(0,210,255,.16),rgba(0,255,157,.12))}
+    .btn-toggle.active{border-color:rgba(0,210,255,.55);background:rgba(0,210,255,.12)}
+    .city-strip{
+      position:fixed;top:70px;left:14px;right:14px;z-index:35;display:flex;gap:8px;
+      overflow:auto;padding:2px 2px 6px;scrollbar-width:none
+    }
+    .city-strip::-webkit-scrollbar{display:none}
+    .city-pill{
+      flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;
+      border:1px solid var(--line);background:rgba(12,26,44,.92);color:var(--text);cursor:pointer;
+      box-shadow:0 12px 24px rgba(0,0,0,.2);transition:transform .16s ease,border-color .16s ease,background .16s ease;white-space:nowrap
+    }
+    .city-pill:hover{transform:translateY(-1px);border-color:rgba(0,210,255,.34)}
+    .city-pill.active{background:rgba(0,210,255,.14);border-color:rgba(0,210,255,.52)}
+    .city-pill .name{font-weight:800}.city-pill .count{color:var(--muted);font-size:.82rem}
+    .dock{
+      position:fixed;left:14px;right:14px;bottom:14px;z-index:34;
+      border:1px solid var(--line);border-radius:24px;
+      background:linear-gradient(180deg,rgba(8,14,24,.96),rgba(6,12,20,.96));
+      box-shadow:var(--shadow);backdrop-filter:blur(18px);overflow:hidden;transition:max-height .2s ease,transform .2s ease
+    }
+    .dock.minimized{max-height:76px;overflow:hidden}
+    .dock.minimized .dock-grid{display:none}
+    .dock.minimized .dock-head{border-bottom:0}
+    .dock.minimized{transform:translateY(calc(100% - 76px))}
+    .dock-head{
+      display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:16px 18px;
+      border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)
+    }
+    .dock-head h3{margin:0;font-size:1.02rem;letter-spacing:-.02em}.dock-head p{margin:6px 0 0;color:var(--muted);font-size:.86rem;line-height:1.45}
+    .dock-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .dock-grid{
+      padding:16px 18px 18px;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+      max-height:34vh;
+      overflow:auto
+    }
+    .section{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(12,26,44,.96);
+      overflow:hidden;display:grid;gap:10px;align-content:start
+    }
+    .section-head{padding:12px 13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:rgba(255,255,255,.02)}
+    .section-head h4{margin:0;font-size:.98rem}.section-head small{display:block;margin-top:4px;color:var(--muted);line-height:1.4}
+    .section-body{padding:12px;display:grid;gap:10px}
+    .card{
+      border:1px solid var(--line);border-radius:16px;background:rgba(8,14,24,.98);padding:12px;
+      cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;display:grid;gap:8px
+    }
+    .card:hover{transform:translateY(-1px);border-color:rgba(0,210,255,.34);background:rgba(0,210,255,.06)}
+    .card.active{border-color:rgba(0,210,255,.58);background:linear-gradient(180deg,rgba(0,210,255,.12),rgba(0,255,157,.06))}
+    .card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .card-top h5{margin:0;font-size:1rem;line-height:1.2;letter-spacing:-.03em}.card-top small{color:var(--muted);display:block;margin-top:4px;line-height:1.4;font-size:.8rem}
+    .tag{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 10px;border:1px solid var(--line);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+    .tag.hot{color:var(--accent);border-color:rgba(0,210,255,.32);background:rgba(0,210,255,.06)}
+    .tag.warn{color:var(--warning);border-color:rgba(255,179,64,.32);background:rgba(255,179,64,.06)}
+    .tag.good{color:var(--accent-2);border-color:rgba(0,255,157,.32);background:rgba(0,255,157,.06)}
+    .meta{display:grid;gap:5px;line-height:1.45;font-size:.9rem}.meta span{color:var(--muted);display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:1px}
+    .footer{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:.8rem;margin-top:auto}
+    .detail,.form-modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(2,7,14,.72);backdrop-filter:blur(10px)}
+    .detail.open,.form-modal.open{display:flex}
+    .modal-card{width:min(960px,100%);max-height:min(90vh,940px);overflow:auto;border-radius:26px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(12,26,44,.98),rgba(8,14,24,.98));box-shadow:var(--shadow);padding:18px}
+    .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px}
+    .modal-head h3{margin:0;font-size:1.2rem;letter-spacing:-.03em}.modal-head p{margin:6px 0 0;color:var(--muted);font-size:.9rem;line-height:1.5}
+    .close-btn{border:1px solid var(--line-strong);background:rgba(12,26,44,.92);color:var(--text);width:42px;height:42px;border-radius:14px;cursor:pointer;font-size:1.1rem;font-weight:900;line-height:1}
+    .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.detail-box{border:1px solid var(--line);border-radius:18px;background:rgba(8,14,24,.98);padding:14px;min-height:100px}.detail-box .label{color:var(--muted);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}.detail-box .content{font-size:.95rem;line-height:1.55;color:var(--text)}.detail-box.full{grid-column:1 / -1}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1 / -1}.field label{color:var(--muted);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:rgba(8,14,24,.96);color:var(--text);padding:12px 13px;border-radius:14px;outline:none;font:inherit}.field textarea{min-height:108px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(0,210,255,.5);box-shadow:0 0 0 4px rgba(0,210,255,.08)}
+    .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;flex-wrap:wrap}
+    .toast{position:fixed;right:18px;bottom:18px;z-index:80;min-width:260px;max-width:360px;padding:14px 16px;border-radius:16px;border:1px solid rgba(0,255,157,.28);background:rgba(7,14,24,.96);color:var(--text);box-shadow:var(--shadow);transform:translateY(16px);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}.toast.show{opacity:1;transform:translateY(0)}.toast strong{color:var(--accent-2)}
+    .leaflet-control-zoom{margin-right:14px !important;margin-top:140px !important;border:1px solid var(--line) !important;border-radius:14px !important;overflow:hidden;box-shadow:var(--shadow) !important}.leaflet-control-zoom a{background:rgba(8,14,24,.92) !important;color:var(--text) !important;border-bottom:1px solid var(--line) !important}.leaflet-control-zoom a:hover{background:rgba(0,210,255,.12) !important}.leaflet-control-attribution{background:rgba(8,14,24,.7) !important;color:rgba(237,245,255,.65) !important;border-radius:10px 0 0 0;font-size:10px !important}
+    .city-icon{width:24px;height:24px;border-radius:999px 999px 999px 0;transform:rotate(-45deg);border:1px solid rgba(255,255,255,.75);background:linear-gradient(180deg,rgba(0,210,255,1),rgba(255,255,255,.5));box-shadow:0 0 0 7px rgba(0,210,255,.1),0 10px 18px rgba(0,0,0,.35);position:relative}.city-icon::after{content:"";position:absolute;inset:6px;border-radius:999px;background:#081526;transform:rotate(45deg)}.city-icon.active{background:linear-gradient(180deg,rgba(0,255,157,1),rgba(255,255,255,.5));box-shadow:0 0 0 8px rgba(0,255,157,.14),0 0 22px rgba(0,255,157,.3),0 10px 18px rgba(0,0,0,.35)}
+    .city-tooltip{border:1px solid rgba(0,210,255,.24) !important;background:rgba(8,14,24,.98) !important;color:var(--text) !important;box-shadow:var(--shadow) !important;padding:10px 12px !important;border-radius:14px !important;font-size:.84rem !important;line-height:1.45 !important}.city-tooltip strong{color:var(--accent);display:block;margin-bottom:4px}
+    .layer-note{position:fixed;right:14px;top:150px;z-index:35;width:min(310px,calc(100vw - 28px));pointer-events:none}
+    .note-card{pointer-events:none;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:rgba(12,26,44,.94);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+    .layer-note.legend-note{top:300px;pointer-events:auto}
+      --bg:#f4f8fc;
+      --bg2:#edf4fb;
+      --bg3:#ffffff;
+      --panel:rgba(255,255,255,.94);
+      --panel-hi:rgba(255,255,255,.98);
+      --line:rgba(88,122,164,.14);
+      --line-strong:rgba(88,122,164,.24);
+      --text:#12304f;
+      --muted:rgba(18,48,79,.72);
+      --accent:#0a84c6;
+      --accent-2:#0b9b71;
+      --warning:#b46a00;
+      --shadow:0 16px 34px rgba(15,23,42,.1);
+    }
+      color: var(--muted) !important;
+    }
+      color: var(--muted) !important;
+    }
+      background-color: rgba(255,255,255,.96) !important;
+      color: var(--text) !important;
+    }
+      box-shadow: 0 10px 24px rgba(15,23,42,.08) !important;
+    }
+      border-color: var(--line) !important;
+    }
+      color: var(--muted) !important;
+    }
+
+    .note-card .eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:800;margin-bottom:8px}.note-card h2{margin:0 0 6px;font-size:1rem;letter-spacing:-.03em;color:var(--white)}.note-card p{margin:0;color:var(--muted);font-size:.88rem;line-height:1.5}
+    .legend-card{pointer-events:auto;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:rgba(12,26,44,.94);backdrop-filter:blur(14px);box-shadow:var(--shadow);display:grid;gap:10px}
+    .legend-card.collapsed .legend-list{display:none}
+    .legend-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .legend-summary{color:var(--muted);font-size:.78rem;line-height:1.35;max-width:180px}
+    .legend-toggle{padding:7px 10px;font-size:.72rem;border-radius:12px;flex:0 0 auto;background:rgba(8,14,24,.96)}
+    .legend-list{display:grid;gap:8px}
+    .legend-item{display:flex;align-items:flex-start;gap:10px;line-height:1.35}
+    .legend-swatch{width:13px;height:13px;border-radius:999px;margin-top:4px;flex:0 0 auto;border:1px solid rgba(255,255,255,.65);box-shadow:0 0 0 4px rgba(255,255,255,.12)}
+    .legend-swatch.green{background:#2ecc71}
+    .legend-swatch.red{background:#ef5350}
+    .legend-swatch.gray{background:#9ca3af}
+    .legend-swatch.darkgreen{background:#0f8a53}
+    .legend-copy strong{display:block;font-size:.84rem;line-height:1.2;margin-bottom:2px;color:var(--white)}
+    .legend-copy small{display:block;color:var(--muted);font-size:.76rem;line-height:1.35}
+    .search-panel{position:fixed;top:118px;left:14px;z-index:36;width:min(520px,calc(100vw - 28px));pointer-events:none}
+    .search-panel .btn{background:rgba(8,14,24,.98)}
+    .search-shell{pointer-events:auto;padding:12px 14px;border:1px solid var(--line);border-radius:18px;background:rgba(12,26,44,.95);backdrop-filter:blur(16px);box-shadow:var(--shadow);display:grid;gap:10px}
+    .search-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .search-head label{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:800}
+    .search-hint{font-size:.76rem;color:var(--muted)}
+    .search-row{display:flex;gap:8px;align-items:center}
+    .search-input{flex:1;min-width:0;border:1px solid var(--line);border-radius:14px;background:rgba(8,14,24,.98);color:var(--text);padding:11px 12px;font:inherit;outline:none;box-shadow:none}
+    .search-input:focus{border-color:rgba(0,210,255,.5);box-shadow:0 0 0 4px rgba(0,210,255,.08)}
+    .search-results{display:grid;gap:6px;max-height:260px;overflow:auto;scrollbar-width:thin}
+    .search-result{width:100%;border:1px solid var(--line);border-radius:14px;background:rgba(8,14,24,.98);padding:10px 12px;text-align:left;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;display:grid;gap:4px}
+    .search-result:hover{transform:translateY(-1px);border-color:rgba(0,210,255,.36);background:rgba(0,210,255,.08)}
+    .search-result strong{font-size:.92rem;line-height:1.2;color:var(--white)}
+    .search-result small{color:var(--muted);font-size:.78rem;line-height:1.35}
+    .search-empty{padding:8px 2px;color:var(--muted);font-size:.86rem;line-height:1.45}
+
+    @media (max-width:1100px){.topbar{gap:10px}.top-stats{justify-content:flex-start}.detail-grid,.form-grid,.dock-grid{grid-template-columns:1fr}.dock-grid{max-height:31vh}.layer-note{display:none}}
+    @media (max-width:760px){.topbar{flex-direction:column;align-items:stretch}.brand,.top-actions{width:100%}.top-actions .btn{flex:1}.dock-head{flex-direction:column}.dock-actions{justify-content:flex-start}.city-strip{top:126px}}
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">V</div>
+      <div class="brand-copy">
+        <h1>VentraSense Base v5</h1>
+        <p>Centro de controle para leads, aeródromos, agenda e operações · dark build</p>
+      </div>
+    </div>
+    <div class="top-stats" id="topStats"></div>
+    <div class="top-actions">
+      <button class="btn btn-toggle active" data-layer="agro">Agro</button>
+      <button class="btn btn-toggle" data-layer="aero">Aero</button>
+      <button class="btn btn-toggle" data-layer="both">Ambos</button>
+      <button class="btn btn-primary" id="openLeadFormBtn">Inserir lead</button>
+      <button class="btn" id="openScheduleBtn">Agendar</button>
+      <button class="btn" id="resetViewBtn">Recentrar</button>
+    </div>
+  </header>
+
+  <div class="city-strip" id="cityStrip"></div>
+
+  <div class="layer-note">
+    <div class="note-card">
+      <div class="eyebrow">Curitiba como centro</div>
+      <h2>Raio visual de 400 km</h2>
+      <p>Use <strong>Agro</strong> para fazendas, <strong>Aero</strong> para aeródromos e <strong>Ambos</strong> para enxergar tudo ao mesmo tempo.</p>
+    </div>
+  </div>
+
+  <div class="layer-note legend-note">
+    <div class="legend-card" id="legendCard">
+      <div class="legend-head">
+        <div>
+          <div class="eyebrow">Legenda dos pins</div>
+          <div class="legend-summary">Veja o significado de cada marcação no mapa.</div>
+        </div>
+        <button class="btn legend-toggle" id="toggleLegendBtn" type="button">Minimizar</button>
+      </div>
+      <div class="legend-list" id="legendList">
+        <div class="legend-item"><span class="legend-swatch green"></span><div class="legend-copy"><strong>Verde</strong><small>Oportunidade de contato / negócio.</small></div></div>
+        <div class="legend-item"><span class="legend-swatch red"></span><div class="legend-copy"><strong>Vermelho</strong><small>Sem chance de negócio: contato feito nos últimos 6 meses e não avançou, ou negado.</small></div></div>
+        <div class="legend-item"><span class="legend-swatch gray"></span><div class="legend-copy"><strong>Cinza</strong><small>Aeroportos com sistemas avançados de meteorologia, como Afonso Pena e Bacacheri.</small></div></div>
+        <div class="legend-item"><span class="legend-swatch darkgreen"></span><div class="legend-copy"><strong>Verde escuro</strong><small>Estamos operando.</small></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-panel">
+    <div class="search-shell">
+      <div class="search-head">
+        <label for="globalSearch">Buscar</label>
+        <span class="search-hint">Digite local, aeródromo ou lead associado</span>
+      </div>
+      <div class="search-row">
+        <input id="globalSearch" class="search-input" type="search" placeholder="Ex.: Fazenda Thalia, Afonso Pena, CoopCampos" autocomplete="off" />
+        <button class="btn" id="clearSearchBtn" type="button">Limpar</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <section class="dock">
+    <div class="dock-head">
+      <div>
+        <h3 id="dockTitle">Cidade selecionada</h3>
+        <p id="dockSubtitle">Escolha um pin no mapa para acompanhar leads, aeródromos e eventos.</p>
+      </div>
+      <div class="dock-actions">
+        <button class="btn" id="toggleDockBtn">Minimizar</button>
+        <button class="btn" id="exportBtn">Exportar JSON</button>
+      </div>
+    </div>
+    <div class="dock-grid">
+      <div class="section" id="agroSection">
+        <div class="section-head">
+          <div>
+            <h4>Agro</h4>
+            <small>Leads da cidade selecionada</small>
+          </div>
+          <span class="tag hot" id="agroCount">0</span>
+        </div>
+        <div class="section-body" id="agroList"></div>
+      </div>
+      <div class="section" id="aeroSection">
+        <div class="section-head">
+          <div>
+            <h4>Aero</h4>
+            <small>Aeródromos no mapa / API DECEA</small>
+          </div>
+          <span class="tag warn" id="aeroCount">0</span>
+        </div>
+        <div class="section-body" id="aeroList"></div>
+      </div>
+      <div class="section">
+        <div class="section-head">
+          <div>
+            <h4>Agenda</h4>
+            <small>Visitas, instalações e follow-ups</small>
+          </div>
+          <span class="tag good" id="eventCount">0</span>
+        </div>
+        <div class="section-body" id="eventList"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="detail" id="detailModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-head">
+        <div>
+          <h3 id="detailTitle">Detalhe</h3>
+          <p id="detailSubtitle"></p>
+        </div>
+        <button class="close-btn" data-close-detail aria-label="Fechar">×</button>
+      </div>
+      <div class="detail-grid" id="detailGrid"></div>
+      <div class="actions" id="detailActions"></div>
+    </div>
+  </div>
+
+  <div class="form-modal" id="leadModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="leadFormTitle">
+      <div class="modal-head">
+        <div>
+          <h3 id="leadFormTitle">Inserir lead</h3>
+          <p>Cadastre uma nova oportunidade para a base dos sócios.</p>
+        </div>
+        <button class="close-btn" data-close-lead aria-label="Fechar">×</button>
+      </div>
+      <form id="leadForm">
+        <div class="form-grid">
+          <div class="field"><label for="leadCity">Cidade</label><select id="leadCity" name="city" required></select></div>
+          <div class="field"><label for="leadName">Nome do lead</label><input id="leadName" name="name" placeholder="Ex.: Fazenda São Miguel" required /></div>
+          <div class="field"><label for="leadContact">Contato</label><input id="leadContact" name="contact" placeholder="Ex.: (42) 99999-0000" required /></div>
+          <div class="field"><label for="leadRepresentative">Nome do representante</label><input id="leadRepresentative" name="representative" placeholder="Ex.: João Pereira" required /></div>
+          <div class="field"><label for="leadEmail">E-mail</label><input id="leadEmail" name="email" type="email" placeholder="contato@fazenda.com.br" /></div>
+          <div class="field"><label for="leadAddress">Endereço</label><input id="leadAddress" name="address" placeholder="Cidade / estrada / referência" /></div>
+          <div class="field"><label for="leadProduction">Produção</label><input id="leadProduction" name="production" placeholder="Soja, milho, trigo, café..." /></div>
+          <div class="field"><label for="leadInterest">Solução de interesse</label><input id="leadInterest" name="interest" placeholder="Estação, sensores, dashboard..." /></div>
+          <div class="field"><label for="leadBudget">Orçamento previsto</label><input id="leadBudget" name="budget" placeholder="Ex.: R$ 18 mil" /></div>
+          <div class="field full"><label for="leadComments">Comentários</label><textarea id="leadComments" name="comments" placeholder="Contexto da operação, dores, próximo passo..."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn" data-close-lead>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="form-modal" id="scheduleModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="scheduleTitle">
+      <div class="modal-head">
+        <div>
+          <h3 id="scheduleTitle">Agendar operação</h3>
+          <p>Visita, reunião, instalação, manutenção ou follow-up vinculados a um lead ou aeródromo.</p>
+        </div>
+        <button class="close-btn" data-close-schedule aria-label="Fechar">×</button>
+      </div>
+      <form id="scheduleForm">
+        <div class="form-grid">
+          <div class="field"><label for="scheduleDate">Data</label><input id="scheduleDate" name="date" type="date" required /></div>
+          <div class="field"><label for="scheduleTime">Hora</label><input id="scheduleTime" name="time" type="time" required /></div>
+          <div class="field"><label for="scheduleType">Tipo</label><select id="scheduleType" name="type"><option>Visita de campo</option><option>Reunião comercial</option><option>Demonstração</option><option>Instalação</option><option>Manutenção</option><option>Follow-up</option></select></div>
+          <div class="field"><label for="scheduleResponsible">Responsável</label><input id="scheduleResponsible" name="responsible" placeholder="Sócio 1 / Sócio 2 / Sócio 3" required /></div>
+          <div class="field"><label for="scheduleCity">Cidade</label><select id="scheduleCity" name="city" required></select></div>
+          <div class="field"><label for="scheduleEntity">Vincular a</label><select id="scheduleEntity" name="entity" required></select></div>
+          <div class="field full"><label for="scheduleObjective">Objetivo</label><input id="scheduleObjective" name="objective" placeholder="Ex.: avaliar ponto de instalação / fechar proposta / levar material" required /></div>
+          <div class="field full"><label for="scheduleNotes">Notas</label><textarea id="scheduleNotes" name="notes" placeholder="Checklist, itens a levar, observações..."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn" data-close-schedule>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar agendamento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    const CONFIG = window.VS_CONFIG;
+    const STORAGE_KEY = 'ventrasense-base-v4';
+    const CURITIBA = [-25.4284, -49.2733];
+    const clone = (v) => JSON.parse(JSON.stringify(v));
+
+    const defaultState = {
+      selectedCityKey: 'ponta-grossa',
+      selectedEntity: { type: 'agro', id: 'monte-verde' },
+      visibleLayers: { agro: true, aero: false },
+      legendMode: true,
+      cities: [
+        { key: 'castro', name: 'Castro', lat: -24.79, lon: -50.01, focus: 'grãos e cooperativas', leads: [
+          { id: 'agrobin', name: 'Agrobin', contact: '(42) 99991-1200', representative: 'Mariana Souza', email: 'mariana@agrobin.com.br', address: 'Rod. PR-151, km 287, Castro - PR', production: 'Soja, milho e trigo', interest: 'Estação agro + sensores de vento e chuva', budget: 'R$ 18 mil a R$ 25 mil', comments: 'Quer reduzir risco na pulverização e monitorar geada com alertas no celular.', stage: 'piloto', status: 'operating' },
+          { id: 'santa-helena-castro', name: 'Fazenda Santa Helena', contact: '(42) 99992-4431', representative: 'João Ferreira', email: 'joao@fsh.com.br', address: 'Colônia Santa Clara, Castro - PR', production: 'Soja e trigo', interest: 'Monitoramento climático e histórico de chuva', budget: 'R$ 15 mil a R$ 22 mil', comments: 'Está avaliando soluções para janelas de aplicação e planejamento de safra.', stage: 'contato', status: 'opportunity' },
+          { id: 'campo-largo-castro', name: 'Grupo Campo Largo', contact: '(42) 99994-3302', representative: 'Ana Pacheco', email: 'ana@camplargoagro.com.br', address: 'Região de Castrolanda, Castro - PR', production: 'Sementes, soja e cevada', interest: 'Dashboard e alertas por e-mail', budget: 'R$ 28 mil a R$ 35 mil', comments: 'Tem operação tecnificada e costuma decidir com base em dados operacionais.', stage: 'demo', status: 'opportunity' }
+        ]},
+        { key: 'carambei', name: 'Carambeí', lat: -24.915, lon: -50.094, focus: 'fazendas tecnificadas', leads: [
+          { id: 'pioneiros-carambei', name: 'Fazenda dos Pioneiros', contact: '(42) 99993-1107', representative: 'Ricardo Alves', email: 'ricardo@pioneirosagro.com.br', address: 'Estrada do Carambeí, Carambeí - PR', production: 'Milho, soja e pastagem', interest: 'Sensores de vento e chuva com dashboard', budget: 'R$ 16 mil a R$ 24 mil', comments: 'Quer centralizar dados climáticos em uma única tela.', stage: 'contato', status: 'opportunity' },
+          { id: 'nova-america', name: 'Estância Nova América', contact: '(42) 99995-7681', representative: 'Paula Nogueira', email: 'paula@novaamerica.com.br', address: 'Área rural de Carambeí - PR', production: 'Soja e trigo', interest: 'Estação agro com alertas de geada', budget: 'R$ 20 mil a R$ 30 mil', comments: 'Trabalha com equipes terceirizadas de pulverização e quer reduzir retrabalho.', stage: 'reuniao', status: 'opportunity' }
+        ]},
+        { key: 'ponta-grossa', name: 'Ponta Grossa', lat: -25.089, lon: -50.16, focus: 'hub regional e cooperativas', leads: [
+          { id: 'coopcampos', name: 'CoopCampos', contact: '(42) 99998-2210', representative: 'Luiz Roberto', email: 'luiz@coopcampos.com.br', address: 'Ponta Grossa - PR', production: 'Atendimento a produtores de grãos', interest: 'Base multiestação com dashboard unificado', budget: 'Projeto piloto + expansão por associados', comments: 'Potencial canal para escalar a solução para vários associados.', stage: 'demo', status: 'opportunity' },
+          { id: 'monte-verde', name: 'Fazenda Monte Verde', contact: '(42) 99990-4088', representative: 'Fernanda Lima', email: 'fernanda@monteverdeagro.com.br', address: 'Distrito de Uvaia, Ponta Grossa - PR', production: 'Soja, milho e trigo', interest: 'Pulverização e monitoramento de chuva', budget: 'R$ 18 mil a R$ 26 mil', comments: 'Procura solução para prever janela de aplicação e reduzir perdas.', stage: 'piloto', status: 'operating' },
+          { id: 'sementes-central', name: 'Sementes Central', contact: '(42) 99996-6623', representative: 'Carlos Mendes', email: 'carlos@sementescentral.com.br', address: 'Centro logístico, Ponta Grossa - PR', production: 'Sementes certificadas', interest: 'Histórico de vento e umidade', budget: 'R$ 22 mil a R$ 32 mil', comments: 'A operação é sensível a clima e transporte entre unidades.', stage: 'contato', status: 'opportunity' }
+        ]},
+        { key: 'palmeira', name: 'Palmeira', lat: -25.42, lon: -49.99, focus: 'cobertura regional e apoio rápido', leads: [
+          { id: 'sao-miguel', name: 'Fazenda São Miguel', contact: '(42) 99997-3344', representative: 'Bruno Antunes', email: 'bruno@saomiguel.com.br', address: 'Palmeira - PR', production: 'Soja e milho', interest: 'Estação agro para decisão de pulverização', budget: 'R$ 14 mil a R$ 20 mil', comments: 'Quer uma solução simples, com instalação e suporte próximos.', stage: 'contato', status: 'opportunity' },
+          { id: 'agropalmeira', name: 'AgroPalmeira', contact: '(42) 99991-7730', representative: 'Patrícia Gomes', email: 'patricia@agropalmeira.com.br', address: 'Palmeira - PR', production: 'Consultoria para diversas propriedades', interest: 'Sensores e alertas via app', budget: 'R$ 18 mil a R$ 28 mil', comments: 'Pode indicar a solução para várias fazendas da região.', stage: 'reuniao', status: 'opportunity' }
+        ]},
+        { key: 'arapoti', name: 'Arapoti', lat: -24.154, lon: -49.82, focus: 'grãos e operação técnica', leads: [
+          { id: 'grupo-arapoti', name: 'Grupo Arapoti', contact: '(42) 99992-9001', representative: 'Sérgio Martins', email: 'sergio@grupoarapoti.com.br', address: 'Rodovia PR-092, Arapoti - PR', production: 'Soja, milho e pastagem', interest: 'Dashboard operacional e alertas de vento', budget: 'R$ 20 mil a R$ 34 mil', comments: 'Busca padronizar a leitura climática em várias áreas da operação.', stage: 'demo', status: 'opportunity' },
+          { id: 'boa-vista', name: 'Fazenda Boa Vista', contact: '(42) 99993-7715', representative: 'Letícia Ribeiro', email: 'leticia@boavistaagro.com.br', address: 'Arapoti - PR', production: 'Milho, soja e integração', interest: 'Monitoramento de chuva e temperatura', budget: 'R$ 13 mil a R$ 21 mil', comments: 'Quer ver se a estação ajuda na tomada de decisão diária da equipe.', stage: 'contato', status: 'opportunity' }
+        ]}
+      ],
+      aerodromes: [
+        { id: 'sbct', icao: 'SBCT', name: 'Aeroporto Afonso Pena', type: 'public', city: 'Curitiba', state: 'PR', lat: -25.5285, lon: -49.1758, use: 'Comercial / público', status: 'advanced-meteo' },
+        { id: 'sbca', icao: 'SBCA', name: 'Aeródromo Bacacheri', type: 'public', city: 'Curitiba', state: 'PR', lat: -25.4051, lon: -49.2325, use: 'Público / aviação geral', status: 'advanced-meteo' },
+        { id: 'ely', icao: 'SIEL', name: 'Aeródromo Ely Rego', type: 'private', city: 'Rolândia', state: 'PR', lat: -23.3119, lon: -51.3912, use: 'Privado / regional' },
+        { id: 'cascavel', icao: 'SBCA2', name: 'Aeroporto Regional de Cascavel', type: 'public', city: 'Cascavel', state: 'PR', lat: -25.0000, lon: -53.5000, use: 'Comercial / regional' },
+        { id: 'londrina', icao: 'SBLO', name: 'Aeroporto Governador José Richa', type: 'public', city: 'Londrina', state: 'PR', lat: -23.3336, lon: -51.1301, use: 'Comercial / regional' },
+        { id: 'maringa', icao: 'SBMG', name: 'Aeroporto Regional de Maringá', type: 'public', city: 'Maringá', state: 'PR', lat: -23.4766, lon: -52.0153, use: 'Comercial / regional' },
+        { id: 'pato', icao: 'SBPO', name: 'Aeroporto de Pato Branco', type: 'public', city: 'Pato Branco', state: 'PR', lat: -26.2167, lon: -52.7000, use: 'Regional' },
+        { id: 'guarapuava', icao: 'SSGA', name: 'Aeroporto de Guarapuava', type: 'public', city: 'Guarapuava', state: 'PR', lat: -25.3833, lon: -51.4667, use: 'Regional' },
+        { id: 'foz', icao: 'SBFI', name: 'Aeroporto de Foz do Iguaçu', type: 'public', city: 'Foz do Iguaçu', state: 'PR', lat: -25.6003, lon: -54.4850, use: 'Comercial / regional' },
+        { id: 'pgz1', icao: 'PGZ1', name: 'Aeródromo Ponta Grossa', type: 'private', city: 'Ponta Grossa', state: 'PR', lat: -25.099, lon: -50.152, use: 'Privado / operação agrícola' },
+        { id: 'cst1', icao: 'CST1', name: 'Aeródromo Castro', type: 'private', city: 'Castro', state: 'PR', lat: -24.806, lon: -50.015, use: 'Privado / fazenda' },
+        { id: 'cbi1', icao: 'CBI1', name: 'Aeródromo Carambeí', type: 'private', city: 'Carambeí', state: 'PR', lat: -24.918, lon: -50.113, use: 'Privado / agrícola' },
+        { id: 'pll1', icao: 'PLL1', name: 'Aeródromo Palmeira', type: 'private', city: 'Palmeira', state: 'PR', lat: -25.412, lon: -49.987, use: 'Privado / rural' },
+        { id: 'arp1', icao: 'ARP1', name: 'Aeródromo Arapoti', type: 'private', city: 'Arapoti', state: 'PR', lat: -24.160, lon: -49.832, use: 'Privado / rural' },
+        { id: 'sdue-thalia', icao: 'SDUE', name: 'Aeródromo Fazenda Thalia / Aeroclube de Planadores de Balsa Nova', type: 'private', city: 'Balsa Nova', state: 'PR', lat: -25.5188889, lon: -49.6986111, use: 'Planadores / rural', status: 'opportunity' }
+      ],
+      events: [
+        { id: 'evt-1', date: '2026-06-19', time: '09:00', type: 'Visita de campo', cityKey: 'castro', entityType: 'agro', entityId: 'agrobin', responsible: 'Sócio 1', objective: 'Avaliar ponto de instalação', notes: 'Levar notebook, ficha técnica e proposta.', status: 'pending' },
+        { id: 'evt-2', date: '2026-06-20', time: '14:00', type: 'Demonstração', cityKey: 'ponta-grossa', entityType: 'agro', entityId: 'monte-verde', responsible: 'Sócio 2', objective: 'Mostrar dashboard e fluxo de alertas', notes: 'Confirmar com o gerente operacional.', status: 'pending' }
+      ]
+    };
+
+    function loadState(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if(!saved) return clone(defaultState);
+        const merged = clone(defaultState);
+        Object.assign(merged, saved);
+        merged.visibleLayers = Object.assign({ agro: true, aero: false }, saved.visibleLayers || {});
+        merged.cities = saved.cities || merged.cities;
+        merged.aerodromes = Array.isArray(saved.aerodromes) && saved.aerodromes.length
+          ? [...saved.aerodromes, ...merged.aerodromes.filter(a => !saved.aerodromes.some(s => s.id === a.id))]
+          : merged.aerodromes;
+        merged.events = saved.events || merged.events;
+        return merged;
+      }catch{
+        return clone(defaultState);
+      }
+    }
+    function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function esc(v){ return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function nl2br(v){ return esc(v).replace(/\n/g,'<br>'); }
+    function stageLabel(stage){ return stage==='piloto' ? 'Piloto' : stage==='demo' ? 'Demo' : stage==='reuniao' ? 'Reunião' : 'Contato'; }
+    function stageClass(stage){ return stage==='piloto' ? 'hot' : stage==='demo' ? 'warn' : stage==='reuniao' ? 'good' : ''; }
+    function haversine(lat1, lon1, lat2, lon2){ const R=6371, toRad=(v)=>v*Math.PI/180, dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1), a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2; return Math.round(2*R*Math.asin(Math.sqrt(a))); }
+    function cityDistance(city){ return haversine(CURITIBA[0], CURITIBA[1], city.lat, city.lon); }
+    function slug(v){ return String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+    function normalizeText(v){ return String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+    function leadPosition(city, index){
+      const offs = [
+        [0.016, -0.012], [-0.018, 0.01], [0.013, 0.017], [-0.01, -0.02], [0.021, 0.008]
+      ][index % 5];
+      return [city.lat + offs[0], city.lon + offs[1]];
+    }
+    function cityKeyByName(name){
+      const city = state.cities.find(c => normalizeText(c.name) === normalizeText(name));
+      return city ? city.key : null;
+    }
+    function collectSearchResults(query){
+      const q = normalizeText(query).trim();
+      if(!q) return [];
+      const results = [];
+      allAgro().forEach(lead => {
+        const hay = normalizeText([
+          lead.name, lead.representative, lead.cityName, lead.address, lead.production, lead.interest, lead.stage
+        ].join(' · '));
+        if(!hay.includes(q)) return;
+        results.push({
+          type: 'agro',
+          id: lead.id,
+          title: lead.name,
+          subtitle: `${lead.cityName} · ${lead.representative}`,
+          detail: lead.address || lead.production || 'Lead agro',
+          lat: lead.lat,
+          lon: lead.lon,
+          zoom: 12,
+          cityKey: lead.cityKey
+        });
+      });
+      state.aerodromes.forEach(aero => {
+        const hay = normalizeText([aero.name, aero.icao, aero.city, aero.state, aero.use].join(' · '));
+        if(!hay.includes(q)) return;
+        results.push({
+          type: 'aero',
+          id: aero.id,
+          title: aero.name,
+          subtitle: `${aero.icao} · ${aero.city}/${aero.state}`,
+          detail: aero.use || 'Aeródromo',
+          lat: aero.lat,
+          lon: aero.lon,
+          zoom: map.getMaxZoom(),
+          cityKey: cityKeyByName(aero.city)
+        });
+      });
+      results.sort((a, b) => {
+        const aExact = normalizeText(a.title) === q ? 0 : 1;
+        const bExact = normalizeText(b.title) === q ? 0 : 1;
+        if(aExact !== bExact) return aExact - bExact;
+        return a.title.localeCompare(b.title, 'pt-BR');
+      });
+      return results;
+    }
+    function focusSearchResult(result){
+      if(result.type === 'aero') state.visibleLayers.aero = true;
+      if(result.type === 'agro') state.visibleLayers.agro = true;
+      if(result.cityKey) state.selectedCityKey = result.cityKey;
+      state.selectedEntity = { type: result.type, id: result.id };
+      saveState();
+      renderAll();
+      map.flyTo([result.lat, result.lon], result.zoom || map.getMaxZoom(), { duration: .7 });
+      const entity = result.type === 'aero'
+        ? { ...(state.aerodromes.find(a => a.id === result.id) || {}), type: 'aero' }
+        : (allAgro().find(l => l.id === result.id) || null);
+      if(entity) openDetail(entity);
+    }
+    function renderSearchResults(){
+      const query = (els.globalSearch?.value || '').trim();
+      if(!query){
+        els.searchResults.innerHTML = '<div class="search-empty">Busque por nome do local, aeródromo ou lead para localizar no mapa.</div>';
+        return;
+      }
+      const results = collectSearchResults(query);
+      if(!results.length){
+        els.searchResults.innerHTML = '<div class="search-empty">Nenhum resultado encontrado. Tente outro nome, ICAO, cidade ou representante.</div>';
+        return;
+      }
+      els.searchResults.innerHTML = results.map(result => `
+        <button type="button" class="search-result" data-search-type="${result.type}" data-search-id="${esc(result.id)}">
+          <strong>${esc(result.title)}</strong>
+          <small>${esc(result.subtitle)}</small>
+          <small>${esc(result.detail)}</small>
+        </button>
+      `).join('');
+      els.searchResults.querySelectorAll('[data-search-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.dataset.searchType;
+          const id = btn.dataset.searchId;
+          const result = results.find(item => item.type === type && item.id === id);
+          if(result) focusSearchResult(result);
+        });
+      });
+    }
+    function leadPosition(city, index){
+      const offs = [
+        [0.016, -0.012], [-0.018, 0.01], [0.013, 0.017], [-0.01, -0.02], [0.021, 0.008]
+      ][index % 5];
+      return [city.lat + offs[0], city.lon + offs[1]];
+    }
+    function allAgro(){ return state.cities.flatMap(city => city.leads.map((lead, i) => ({ ...lead, type:'agro', cityKey: city.key, cityName: city.name, lat: leadPosition(city, i)[0], lon: leadPosition(city, i)[1], distance: cityDistance(city) }))); }
+    function visibleAeros(){
+      const bounds = map.getBounds();
+      return state.aerodromes.filter(a => bounds.contains([a.lat, a.lon]) || state.visibleLayers.aero);
+    }
+    function currentCity(){ return state.cities.find(c => c.key === state.selectedCityKey) || state.cities[0]; }
+    function selectedEntity(){
+      if(state.selectedEntity.type === 'agro'){
+        const lead = allAgro().find(l => l.id === state.selectedEntity.id);
+        return lead ? { ...lead } : { ...allAgro()[0], type:'agro' };
+      }
+      const aero = state.aerodromes.find(a => a.id === state.selectedEntity.id);
+      return aero ? { ...aero, type:'aero' } : { ...state.aerodromes[0], type:'aero' };
+    }
+
+    const state = loadState();
+    const map = L.map('map', { zoomControl: true, scrollWheelZoom: true, preferCanvas: true }).setView(CURITIBA, 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+    const agroLayer = L.layerGroup().addTo(map);
+    const aeroLayer = L.layerGroup().addTo(map);
+    const curitibaCircle = L.circle(CURITIBA, { radius: 400000, color:'#54d2ff', weight:2, dashArray:'10 10', fillColor:'#54d2ff', fillOpacity:0.05 }).addTo(map);
+    L.circleMarker(CURITIBA, { radius:8, color:'#7cffb2', weight:3, fillColor:'#7cffb2', fillOpacity:0.95 }).addTo(map).bindTooltip('<strong>Curitiba</strong><div>Centro operacional</div>', { direction:'top', opacity:1, sticky:true, className:'city-tooltip' });
+
+    const els = {
+      topStats: document.getElementById('topStats'), cityStrip: document.getElementById('cityStrip'),
+      dockTitle: document.getElementById('dockTitle'), dockSubtitle: document.getElementById('dockSubtitle'),
+      agroSection: document.getElementById('agroSection'), aeroSection: document.getElementById('aeroSection'),
+      agroList: document.getElementById('agroList'), aeroList: document.getElementById('aeroList'), eventList: document.getElementById('eventList'),
+      agroCount: document.getElementById('agroCount'), aeroCount: document.getElementById('aeroCount'), eventCount: document.getElementById('eventCount'),
+      detailModal: document.getElementById('detailModal'), detailTitle: document.getElementById('detailTitle'), detailSubtitle: document.getElementById('detailSubtitle'), detailGrid: document.getElementById('detailGrid'), detailActions: document.getElementById('detailActions'),
+      leadModal: document.getElementById('leadModal'), leadForm: document.getElementById('leadForm'), leadCity: document.getElementById('leadCity'),
+      scheduleModal: document.getElementById('scheduleModal'), scheduleForm: document.getElementById('scheduleForm'), scheduleDate: document.getElementById('scheduleDate'), scheduleTime: document.getElementById('scheduleTime'), scheduleType: document.getElementById('scheduleType'), scheduleResponsible: document.getElementById('scheduleResponsible'), scheduleCity: document.getElementById('scheduleCity'), scheduleEntity: document.getElementById('scheduleEntity'), scheduleObjective: document.getElementById('scheduleObjective'), scheduleNotes: document.getElementById('scheduleNotes'),
+      toast: document.getElementById('toast'),
+      globalSearch: document.getElementById('globalSearch'),
+      searchResults: document.getElementById('searchResults'),
+      clearSearchBtn: document.getElementById('clearSearchBtn'),
+      legendCard: document.getElementById('legendCard'),
+      legendList: document.getElementById('legendList'),
+      toggleLegendBtn: document.getElementById('toggleLegendBtn'),
+      legendSummary: document.querySelector('.legend-summary')
+    };
+
+    function toast(message){ els.toast.innerHTML = message; els.toast.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => els.toast.classList.remove('show'), 2400); }
+    function openModal(modal){ modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); }
+    function closeModal(modal){ modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
+    function openDetail(entity){ state.selectedEntity = { type: entity.type, id: entity.id }; saveState(); renderAll(); openModal(els.detailModal); }
+    function currentEntityForSchedule(){ const s = selectedEntity(); return s; }
+
+    function renderStats(){
+      const agro = allAgro().length;
+      const aero = state.aerodromes.length;
+      const events = state.events.length;
+      const active = allAgro().filter(l => l.stage !== 'contato').length;
+      const source = CONFIG.DECEA_AERODROMES_URL ? 'DECEA' : 'mock';
+      els.topStats.innerHTML = `
+        <div class="stat-chip"><strong>${agro}</strong> leads agro</div>
+        <div class="stat-chip"><strong>${aero}</strong> aeródromos</div>
+        <div class="stat-chip"><strong>${events}</strong> agenda</div>
+        <div class="stat-chip"><strong>${active}</strong> oportunidades</div>
+        <div class="stat-chip">Aero: <strong>${source}</strong></div>`;
+    }
+
+    function renderCityStrip(){
+      els.cityStrip.innerHTML = state.cities.map(city => `<button class="city-pill ${city.key===state.selectedCityKey ? 'active' : ''}" data-city="${city.key}"><span class="name">${esc(city.name)}</span><span class="count">${cityDistance(city)} km · ${city.leads.length} leads</span></button>`).join('');
+      els.cityStrip.querySelectorAll('[data-city]').forEach(btn => btn.addEventListener('click', () => {
+        state.selectedCityKey = btn.dataset.city;
+        const first = currentCity().leads[0];
+        if(first) state.selectedEntity = { type:'agro', id:first.id };
+        saveState(); renderAll(); map.flyTo([currentCity().lat, currentCity().lon], 7.3, { duration: .65 });
+      }));
+    }
+
+    function renderLayerButtons(){
+      document.querySelectorAll('[data-layer]').forEach(btn => {
+        const layer = btn.dataset.layer;
+        const active = layer === 'both' ? (state.visibleLayers.agro && state.visibleLayers.aero) : !!state.visibleLayers[layer];
+        btn.classList.toggle('active', active || (layer==='both' && state.visibleLayers.agro && state.visibleLayers.aero));
+        btn.onclick = () => {
+          if(layer === 'both'){
+            state.visibleLayers.agro = true; state.visibleLayers.aero = true;
+          } else {
+            state.visibleLayers[layer] = !state.visibleLayers[layer];
+            if(!state.visibleLayers.agro && !state.visibleLayers.aero) state.visibleLayers.agro = true;
+          }
+          saveState(); renderAll();
+        };
+      });
+    }
+
+    function markerGradient(tone){
+      if(tone === 'red') return 'linear-gradient(180deg,#ef5350,#ffd6d5)';
+      if(tone === 'gray') return 'linear-gradient(180deg,#9ca3af,#eef1f4)';
+      if(tone === 'darkgreen') return 'linear-gradient(180deg,#0f8a53,#dff3e9)';
+      return 'linear-gradient(180deg,#2ecc71,#dff7ea)';
+    }
+    function leadTone(lead){
+      if(lead.status === 'no-go') return 'red';
+      if(lead.status === 'operating' || lead.stage === 'piloto') return 'darkgreen';
+      return 'green';
+    }
+    function aeroTone(aero){
+      if(aero.status === 'advanced-meteo') return 'gray';
+      if(aero.status === 'operating') return 'darkgreen';
+      return 'green';
+    }
+    function agroIcon(lead, active){
+      const tone = leadTone(lead);
+      return L.divIcon({ className:'', html:`<div class="city-icon ${active ? 'active' : ''}" style="background:${markerGradient(tone)}"></div>`, iconSize:[24,24], iconAnchor:[12,24] });
+    }
+    function aeroIcon(aero){
+      const tone = aeroTone(aero);
+      return L.divIcon({ className:'', html:`<div class="city-icon" style="background:${markerGradient(tone)}"></div>`, iconSize:[24,24], iconAnchor:[12,24] });
+    }
+
+    function renderMarkers(){
+      agroLayer.clearLayers(); aeroLayer.clearLayers();
+      if(state.visibleLayers.agro){
+        allAgro().forEach(lead => {
+          const marker = L.marker([lead.lat, lead.lon], { icon: agroIcon(lead, state.selectedEntity.type==='agro' && state.selectedEntity.id===lead.id) }).addTo(agroLayer);
+          marker.bindTooltip(`<strong>${esc(lead.name)}</strong><div>${esc(lead.cityName)} · ${lead.distance} km de Curitiba</div>`, { direction:'top', sticky:true, className:'city-tooltip' });
+          marker.on('click', () => openDetail(lead));
+        });
+      }
+      if(state.visibleLayers.aero){
+        state.aerodromes.forEach(aero => {
+          const marker = L.marker([aero.lat, aero.lon], { icon: aeroIcon(aero) }).addTo(aeroLayer);
+          marker.bindTooltip(`<strong>${esc(aero.name)}</strong><div>${esc(aero.icao)} · ${aero.city}/${aero.state} · ${cityDistance({ lat:aero.lat, lon:aero.lon })} km de Curitiba</div>`, { direction:'top', sticky:true, className:'city-tooltip' });
+          marker.on('click', () => openDetail({ ...aero, type:'aero' }));
+        });
+      }
+    }
+
+    function renderDock(){
+      const city = currentCity();
+      els.dockTitle.textContent = `${city.name} · ${cityDistance(city)} km de Curitiba`;
+      els.dockSubtitle.textContent = `Foco atual: ${city.focus}. Selecione um lead, aeródromo ou agendamento para abrir a ficha.`;
+
+      const agroVisible = state.visibleLayers.agro;
+      const aeroVisible = state.visibleLayers.aero;
+      els.agroSection.style.display = agroVisible ? 'grid' : 'none';
+      els.aeroSection.style.display = aeroVisible ? 'grid' : 'none';
+
+      const cityLeads = allAgro().filter(l => l.cityKey === city.key);
+      els.agroCount.textContent = String(cityLeads.length);
+      els.agroList.innerHTML = cityLeads.map(lead => `
+        <article class="card ${state.selectedEntity.type==='agro' && state.selectedEntity.id===lead.id ? 'active' : ''}" data-agro="${lead.id}">
+          <div class="card-top">
+            <div><h5>${esc(lead.name)}</h5><small>${esc(lead.representative)} · ${esc(lead.contact)}</small></div>
+            <span class="tag ${lead.status === 'no-go' ? 'warn' : stageClass(lead.stage)}">${lead.status === 'no-go' ? 'Sem negócio' : stageLabel(lead.stage)}</span>
+          </div>
+          <div class="meta"><span>Produção</span>${esc(lead.production)}</div>
+          <div class="meta"><span>Solução</span>${esc(lead.interest)}</div>
+          <div class="footer"><span>${esc(lead.address || lead.cityName)}</span><span>${lead.distance} km</span></div>
+        </article>
+      `).join('') || '<div class="card"><div class="meta">Nenhum lead nesta cidade.</div></div>';
+      els.agroList.querySelectorAll('[data-agro]').forEach(c => c.addEventListener('click', () => openDetail(allAgro().find(l => l.id === c.dataset.agro))));
+
+      const aeroVisibleItems = visibleAeros();
+      els.aeroCount.textContent = String(aeroVisibleItems.length);
+      els.aeroList.innerHTML = aeroVisibleItems.map(aero => `
+        <article class="card ${state.selectedEntity.type==='aero' && state.selectedEntity.id===aero.id ? 'active' : ''}" data-aero="${aero.id}">
+          <div class="card-top">
+            <div><h5>${esc(aero.name)}</h5><small>${esc(aero.icao)} · ${esc(aero.city)}/${esc(aero.state)}</small></div>
+            <span class="tag ${aero.status === 'advanced-meteo' ? 'good' : aero.status === 'operating' ? 'good' : aero.type==='private' ? 'warn' : 'hot'}">${aero.status === 'advanced-meteo' ? 'Met. avançada' : aero.status === 'operating' ? 'Operando' : aero.type === 'private' ? 'Privado' : 'Público'}</span>
+          </div>
+          <div class="meta"><span>Uso</span>${esc(aero.use || 'A definir')}</div>
+          <div class="meta"><span>Distância</span>${cityDistance({ lat:aero.lat, lon:aero.lon })} km</div>
+          <div class="footer"><span>${CONFIG.DECEA_AERODROMES_URL ? 'DECEA' : 'Mock'}</span><span>clique para abrir</span></div>
+        </article>
+      `).join('') || '<div class="card"><div class="meta">Nenhum aeródromo visível na área atual.</div></div>';
+      els.aeroList.querySelectorAll('[data-aero]').forEach(c => c.addEventListener('click', () => openDetail({ ...state.aerodromes.find(a => a.id === c.dataset.aero), type:'aero' })));
+
+      const events = [...state.events].sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+      els.eventCount.textContent = String(events.length);
+      els.eventList.innerHTML = events.slice(0,5).map(ev => {
+        const cityName = (state.cities.find(c => c.key === ev.cityKey) || {}).name || '—';
+        const linked = ev.entityType === 'aero' ? (state.aerodromes.find(a => a.id === ev.entityId)?.name || 'Aeródromo') : (allAgro().find(l => l.id === ev.entityId)?.name || 'Lead');
+        return `
+          <article class="card" data-event="${ev.id}">
+            <div class="card-top">
+              <div><h5>${ev.type}</h5><small>${ev.date} · ${ev.time} · ${cityName}</small></div>
+              <span class="tag good">${esc(ev.responsible)}</span>
+            </div>
+            <div class="meta"><span>Vinculado a</span>${esc(linked)}</div>
+            <div class="meta"><span>Objetivo</span>${esc(ev.objective)}</div>
+            <div class="footer"><span>${ev.status || 'pending'}</span><span>clique para focar</span></div>
+          </article>
+        `;
+      }).join('') || '<div class="card"><div class="meta">Nenhum compromisso salvo.</div></div>';
+      els.eventList.querySelectorAll('[data-event]').forEach(c => c.addEventListener('click', () => {
+        const ev = state.events.find(e => e.id === c.dataset.event); if(!ev) return;
+        state.selectedCityKey = ev.cityKey;
+        state.selectedEntity = { type: ev.entityType, id: ev.entityId };
+        saveState(); renderAll(); openDetail(selectedEntity());
+      }));
+    }
+
+    function renderDetail(){
+      const entity = selectedEntity();
+      if(!entity) return;
+      if(entity.type === 'aero' && state.visibleLayers.aero === false) state.visibleLayers.aero = true;
+      const isAero = entity.type === 'aero';
+      const cityName = isAero ? entity.city : (entity.cityName || currentCity().name);
+      const dist = isAero ? cityDistance({ lat: entity.lat, lon: entity.lon }) : entity.distance;
+      els.detailTitle.textContent = entity.name;
+      els.detailSubtitle.textContent = isAero
+        ? `${entity.icao} · ${cityName}/${entity.state} · ${dist} km de Curitiba`
+        : `${cityName} · ${dist} km de Curitiba · ${stageLabel(entity.stage)}`;
+
+      if(isAero){
+        els.detailGrid.innerHTML = `
+          <div class="detail-box"><div class="label">Identificação</div><div class="content"><strong>${esc(entity.name)}</strong><br>${esc(entity.icao)}<br>${entity.type === 'private' ? 'Privado' : 'Público'}</div></div>
+          <div class="detail-box"><div class="label">Localização</div><div class="content">${esc(entity.city)}/${esc(entity.state)}<br>${entity.lat.toFixed(4)}, ${entity.lon.toFixed(4)}</div></div>
+          <div class="detail-box"><div class="label">Uso</div><div class="content">${esc(entity.use || 'Não informado')}</div></div>
+          <div class="detail-box"><div class="label">Fonte</div><div class="content">${CONFIG.DECEA_AERODROMES_URL ? 'DECEA / API configurada' : 'Dados mock para teste visual'}</div></div>
+          <div class="detail-box full"><div class="label">Notas</div><div class="content">Este aeródromo pode entrar em operação / rota / suporte com a equipe VentraSense.</div></div>
+        `;
+        els.detailActions.innerHTML = `<button class="btn btn-primary" id="scheduleFromDetail">Agendar operação</button><button class="btn" id="focusOnMap">Ver no mapa</button>`;
+      } else {
+        els.detailGrid.innerHTML = `
+          <div class="detail-box"><div class="label">Contato</div><div class="content"><strong>${esc(entity.representative)}</strong><br>${esc(entity.contact)}<br>${esc(entity.email || 'E-mail não informado')}</div></div>
+          <div class="detail-box"><div class="label">Endereço</div><div class="content">${esc(entity.address || 'Não informado')}</div></div>
+          <div class="detail-box"><div class="label">Produção</div><div class="content">${esc(entity.production || 'Não informado')}</div></div>
+          <div class="detail-box"><div class="label">Solução de interesse</div><div class="content">${esc(entity.interest || 'Não informado')}</div></div>
+          <div class="detail-box"><div class="label">Orçamento previsto</div><div class="content">${esc(entity.budget || 'Não informado')}</div></div>
+          <div class="detail-box"><div class="label">Próximo passo</div><div class="content">${entity.stage === 'piloto' ? 'Fechar instalação piloto.' : entity.stage === 'demo' ? 'Agendar demonstração.' : entity.stage === 'reuniao' ? 'Confirmar reunião e alinhar escopo.' : 'Fazer contato inicial.'}</div></div>
+          <div class="detail-box full"><div class="label">Comentários</div><div class="content">${nl2br(entity.comments || 'Sem comentários.')}</div></div>
+        `;
+        els.detailActions.innerHTML = `<button class="btn btn-primary" id="scheduleFromDetail">Agendar visita</button><button class="btn" id="editLeadQuick">Criar proposta</button>`;
+      }
+
+      document.getElementById('scheduleFromDetail').onclick = () => { fillScheduleFromSelected(); openSchedule(); };
+      const focusBtn = document.getElementById('focusOnMap');
+      if(focusBtn){
+        focusBtn.onclick = () => {
+          map.flyTo([entity.lat, entity.lon], map.getMaxZoom(), { duration:.7 });
+          closeModal(els.detailModal);
+        };
+      }
+      const proposalBtn = document.getElementById('editLeadQuick');
+      if(proposalBtn) proposalBtn.onclick = () => toast('<strong>Proposta.</strong> Esta etapa pode virar a página de propostas na próxima versão.');
+    }
+
+    function renderLeadSelects(){
+      els.leadCity.innerHTML = state.cities.map(c => `<option value="${c.key}">${esc(c.name)}</option>`).join('');
+      els.leadCity.value = state.selectedCityKey;
+      els.scheduleCity.innerHTML = state.cities.map(c => `<option value="${c.key}">${esc(c.name)}</option>`).join('');
+      els.scheduleCity.value = state.selectedCityKey;
+    }
+
+    function renderScheduleEntityOptions(){
+      const city = state.cities.find(c => c.key === els.scheduleCity.value) || currentCity();
+      const agroOptions = allAgro().filter(l => l.cityKey === city.key).map(l => `<option value="agro:${l.id}">${esc(l.name)}</option>`).join('');
+      const aeroOptions = state.aerodromes.map(a => `<option value="aero:${a.id}">${esc(a.name)} (${a.icao})</option>`).join('');
+      els.scheduleEntity.innerHTML = `${agroOptions}${aeroOptions}` || '<option value="">Sem itens</option>';
+      if(state.selectedEntity?.type && state.selectedEntity?.id){
+        const wanted = `${state.selectedEntity.type}:${state.selectedEntity.id}`;
+        const opt = [...els.scheduleEntity.options].find(o => o.value === wanted);
+        if(opt) els.scheduleEntity.value = wanted;
+      }
+    }
+
+    function fillScheduleFromSelected(){
+      const entity = selectedEntity();
+      if(entity.type === 'aero'){
+        els.scheduleType.value = 'Manutenção';
+        els.scheduleObjective.value = `Operação com ${entity.name}`;
+      } else {
+        els.scheduleType.value = 'Visita de campo';
+        els.scheduleObjective.value = `Visita para ${entity.name}`;
+      }
+      const today = new Date();
+      const pad = (n) => String(n).padStart(2,'0');
+      els.scheduleDate.value = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+      els.scheduleTime.value = '09:00';
+      els.scheduleResponsible.value = 'Sócio 1';
+      els.scheduleNotes.value = '';
+      els.scheduleCity.value = state.selectedCityKey;
+      renderScheduleEntityOptions();
+      els.scheduleEntity.value = `${entity.type}:${entity.id}`;
+    }
+
+    function renderAll(){
+      renderStats(); renderLayerButtons(); renderCityStrip(); renderMarkers(); renderDock(); renderLeadSelects(); renderScheduleEntityOptions(); renderSearchResults(); renderDetail();
+      saveState();
+    }
+
+    function openLeadForm(){ els.leadForm.reset(); els.leadCity.value = state.selectedCityKey; openModal(els.leadModal); }
+    function openSchedule(){ fillScheduleFromSelected(); openModal(els.scheduleModal); }
+
+    function saveLead(form){
+      const fd = new FormData(form);
+      const city = state.cities.find(c => c.key === fd.get('city')) || currentCity();
+      const lead = {
+        id: `${slug(fd.get('name'))}-${Date.now()}`,
+        name: String(fd.get('name') || '').trim(),
+        contact: String(fd.get('contact') || '').trim(),
+        representative: String(fd.get('representative') || '').trim(),
+        email: String(fd.get('email') || '').trim(),
+        address: String(fd.get('address') || '').trim(),
+        production: String(fd.get('production') || '').trim(),
+        interest: String(fd.get('interest') || '').trim(),
+        budget: String(fd.get('budget') || '').trim(),
+        comments: String(fd.get('comments') || '').trim(),
+        stage: 'contato'
+      };
+      city.leads.unshift(lead);
+      state.selectedCityKey = city.key;
+      state.selectedEntity = { type: 'agro', id: lead.id };
+      saveState(); renderAll(); map.flyTo([city.lat, city.lon], 7.7, { duration:.7 }); toast(`<strong>Lead salvo.</strong> ${esc(lead.name)} foi adicionado em ${esc(city.name)}.`); closeModal(els.leadModal); form.reset();
+    }
+
+    function saveEvent(form){
+      const fd = new FormData(form);
+      const [entityType, entityId] = String(fd.get('entity')).split(':');
+      const event = {
+        id: `evt-${Date.now()}`,
+        date: fd.get('date'),
+        time: fd.get('time'),
+        type: fd.get('type'),
+        responsible: fd.get('responsible'),
+        cityKey: fd.get('city'),
+        entityType,
+        entityId,
+        objective: fd.get('objective'),
+        notes: fd.get('notes'),
+        status: 'pending'
+      };
+      state.events.unshift(event);
+      state.selectedCityKey = event.cityKey;
+      state.selectedEntity = { type: entityType, id: entityId };
+      saveState(); renderAll(); toast('<strong>Agendado.</strong> O compromisso foi salvo na agenda.'); closeModal(els.scheduleModal); form.reset();
+    }
+
+    function exportJson(){
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'ventrasense-base.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); toast('<strong>Exportado.</strong> O JSON da base foi baixado com sucesso.');
+    }
+
+    function resetMap(){ map.flyTo(CURITIBA, 6, { duration:.7 }); toast('<strong>Mapa recentrado.</strong> Curitiba voltou ao foco principal.'); }
+
+    function toggleDock(){
+      const dock = document.querySelector('.dock');
+      const btn = document.getElementById('toggleDockBtn');
+      if (!dock || !btn) return;
+      dock.classList.toggle('minimized');
+      const minimized = dock.classList.contains('minimized');
+      btn.textContent = minimized ? 'Expandir' : 'Minimizar';
+      btn.setAttribute('aria-pressed', String(minimized));
+    }
+
+    function updateDockStateFromScroll(){
+      const dock = document.querySelector('.dock');
+      if (!dock) return;
+      const shouldMinimize = window.innerWidth < 900;
+      if (shouldMinimize) {
+        dock.classList.add('minimized');
+        const btn = document.getElementById('toggleDockBtn');
+        if (btn) {
+          btn.textContent = 'Expandir';
+          btn.setAttribute('aria-pressed', 'true');
+        }
+      }
+    }
+
+    window.addEventListener('resize', updateDockStateFromScroll);
+    window.addEventListener('load', updateDockStateFromScroll);
+
+    function currentViewIsMinimized(){
+      const dock = document.querySelector('.dock');
+      return !!dock?.classList.contains('minimized');
+    }
+
+    function ensureDockVisible(){
+      const dock = document.querySelector('.dock');
+      if (!dock) return;
+      if (!currentViewIsMinimized()) return;
+      dock.classList.remove('minimized');
+      const btn = document.getElementById('toggleDockBtn');
+      if (btn) {
+        btn.textContent = 'Minimizar';
+        btn.setAttribute('aria-pressed', 'false');
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'm' || e.key === 'M') toggleDock();
+    });
+
+    async function loadAeroFromDECEA(){
+      const url = CONFIG.DECEA_AERODROMES_URL;
+      if(!url) return;
+      try{
+        const headers = {};
+        if(CONFIG.DECEA_API_KEY){
+          headers[CONFIG.DECEA_AUTH_HEADER || 'Authorization'] = `${CONFIG.DECEA_AUTH_PREFIX || 'Bearer'} ${CONFIG.DECEA_API_KEY}`;
+        }
+        const res = await fetch(url, { headers });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const raw = Array.isArray(data) ? data : (data.features || data.items || data.results || data.data || []);
+        const mapped = raw.map(normalizeAerodrome).filter(Boolean);
+        if(mapped.length){
+          const merged = [...mapped];
+          for(const existing of state.aerodromes){
+            if(!merged.some(a => a.id === existing.id)) merged.push(existing);
+          }
+          state.aerodromes = merged;
+          saveState(); renderAll();
+          toast('<strong>DECEA conectado.</strong> Aeródromos carregados da API.');
+        }
+      }catch(err){
+        console.warn('DECEA load failed', err);
+        toast('<strong>DECEA indisponível.</strong> Usando dados mock para o mapa.');
+      }
+    }
+
+    function normalizeAerodrome(item){
+      if(!item) return null;
+      if(item.type === 'Feature'){
+        const p = item.properties || {};
+        const c = item.geometry?.coordinates || [];
+        return {
+          id: p.id || p.icao || slug(p.nome || p.name || 'aero'),
+          icao: p.icao || p.codigo || p.icaoCode || '',
+          name: p.nome || p.name || p.designacao || 'Aeródromo',
+          type: String(p.classification || p.tipo || p.type || 'private').toLowerCase().includes('public') ? 'public' : 'private',
+          city: p.municipio || p.city || '',
+          state: p.uf || p.state || 'PR',
+          lat: c[1], lon: c[0],
+          use: p.uso || p.use || 'A definir'
+        };
+      }
+      const lat = Number(item.lat ?? item.latitude ?? item.coordinates?.lat ?? item.geometry?.coordinates?.[1]);
+      const lon = Number(item.lon ?? item.lng ?? item.longitude ?? item.coordinates?.lon ?? item.geometry?.coordinates?.[0]);
+      if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      return {
+        id: item.id || item.icao || slug(item.name || item.nome || 'aero'),
+        icao: item.icao || item.code || item.codigo || '',
+        name: item.name || item.nome || item.designation || 'Aeródromo',
+        type: String(item.type || item.classification || item.private || item.public || '').toLowerCase().includes('public') ? 'public' : 'private',
+        city: item.city || item.municipio || item.localidade || '',
+        state: item.state || item.uf || 'PR',
+        lat, lon,
+        use: item.use || item.uso || item.description || 'A definir'
+      };
+    }
+
+    function renderControls(){
+      document.querySelectorAll('[data-close-detail]').forEach(b => b.onclick = () => closeModal(els.detailModal));
+      document.querySelectorAll('[data-close-lead]').forEach(b => b.onclick = () => closeModal(els.leadModal));
+      document.querySelectorAll('[data-close-schedule]').forEach(b => b.onclick = () => closeModal(els.scheduleModal));
+      document.getElementById('openLeadFormBtn').onclick = openLeadForm;
+      document.getElementById('openScheduleBtn').onclick = openSchedule;
+      document.getElementById('resetViewBtn').onclick = resetMap;
+      document.getElementById('exportBtn').onclick = exportJson;
+      document.getElementById('toggleDockBtn').onclick = toggleDock;
+      els.scheduleCity.onchange = renderScheduleEntityOptions;
+      els.globalSearch.addEventListener('input', renderSearchResults);
+      els.globalSearch.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){
+          const results = collectSearchResults(els.globalSearch.value);
+          if(results[0]) focusSearchResult(results[0]);
+        }
+      });
+      els.clearSearchBtn.onclick = () => {
+        els.globalSearch.value = '';
+        renderSearchResults();
+        els.globalSearch.focus();
+      };
+      document.getElementById('toggleLegendBtn').onclick = () => {
+        const collapsed = els.legendCard.classList.toggle('collapsed');
+        document.getElementById('toggleLegendBtn').textContent = collapsed ? 'Expandir' : 'Minimizar';
+        if(els.legendSummary) els.legendSummary.style.display = collapsed ? 'none' : 'block';
+      };      renderSearchResults();
+    }
+
+    els.leadForm.addEventListener('submit', e => { e.preventDefault(); saveLead(e.currentTarget); });
+    els.scheduleForm.addEventListener('submit', e => { e.preventDefault(); saveEvent(e.currentTarget); });
+    els.detailModal.addEventListener('click', e => { if(e.target === els.detailModal) closeModal(els.detailModal); });
+    els.leadModal.addEventListener('click', e => { if(e.target === els.leadModal) closeModal(els.leadModal); });
+    els.scheduleModal.addEventListener('click', e => { if(e.target === els.scheduleModal) closeModal(els.scheduleModal); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeModal(els.detailModal); closeModal(els.leadModal); closeModal(els.scheduleModal); } });
+    window.addEventListener('resize', () => map.invalidateSize());
+    map.on('moveend', () => { renderDock(); if(state.visibleLayers.aero) renderMarkers(); });
+
+    function initialRender(){ renderControls(); renderAll(); renderLeadSelects(); renderScheduleEntityOptions(); map.invalidateSize(); }
+    initialRender();
+    loadAeroFromDECEA();
+    map.flyTo([currentCity().lat, currentCity().lon], 7.1, { duration:.7 });
+  </script>
+</body>
+</html>
